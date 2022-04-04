@@ -5,8 +5,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-08-25T12:21:36.218Z\n"
-"PO-Revision-Date: 2021-08-25T12:21:36.218Z\n"
+"POT-Creation-Date: 2022-04-04T07:25:50.878Z\n"
+"PO-Revision-Date: 2022-04-04T07:25:50.878Z\n"
+
+msgid "API error code: {{statusText}} ({{status}})"
+msgstr ""
 
 msgid "Add"
 msgstr ""
@@ -24,4 +27,31 @@ msgid "Hello {{name}}"
 msgstr ""
 
 msgid "Detail page"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Start container"
+msgstr ""
+
+msgid "Stop container"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Create new container"
+msgstr ""
+
+msgid "Ok"
+msgstr ""
+
+msgid "Search by name"
 msgstr ""
