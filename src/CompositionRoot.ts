@@ -5,11 +5,14 @@ import { ContainerD2DockerApiRepository } from "./data/repositories/ContainerD2D
 import { GetCurrentUserUseCase } from "./domain/usecases/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/GetInstanceVersionUseCase";
 import { ListAllContainersUseCase } from "./domain/usecases/ListAllContainersUseCase";
+import { StartContainerUseCase } from "./domain/usecases/StartContainerUseCase";
+import { StopContainerUseCase } from "./domain/usecases/StopContainerUseCase";
+import { ListProjectsUseCase } from "./domain/usecases/ListProjectsUseCase";
+import { ListRepoArtifactsUseCase } from "./domain/usecases/ListRepoArtifactsUseCase";
 
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const containerRepository = new ContainerD2DockerApiRepository(instance);
-
 
     return {
         instance: getExecute({
@@ -18,6 +21,10 @@ export function getCompositionRoot(instance: Instance) {
         }),
         container: getExecute({
             listAll: new ListAllContainersUseCase(containerRepository),
+            start: new StartContainerUseCase(containerRepository),
+            stop: new StopContainerUseCase(containerRepository),
+            listProjects: new ListProjectsUseCase(containerRepository),
+            listArtifacts: new ListRepoArtifactsUseCase(containerRepository)
         }),
     };
 }

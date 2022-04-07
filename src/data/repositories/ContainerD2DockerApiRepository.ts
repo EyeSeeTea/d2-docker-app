@@ -2,27 +2,98 @@ import AbortController from "abort-controller";
 import _ from "lodash";
 import { D2Api } from "@eyeseetea/d2-api/2.34";
 import { Future, FutureData } from "../../domain/entities/Future";
-import { User } from "../../domain/entities/User";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
-import { cache } from "../../utils/cache";
 import { getD2APiFromInstance } from "../../utils/d2-api";
-import { apiToFuture } from "../../utils/futures";
 import { Instance } from "../entities/Instance";
 import i18n from "../../locales";
-
+import { Container, ContainerStatus } from "../../domain/entities/Container";
+/*
+            {
+    "image": "docker.eyeseetea.com/eyeseetea/dhis2-data:2.33.6-sp-cpr-dev2", "port": 8080, "detach": true
+}
+        */
 export class ContainerD2DockerApiRepository implements ContainerRepository {
     private api: D2Api;
     constructor(instance: Instance) {
         this.api = getD2APiFromInstance(instance);
     }
-/*
-.map(({ containers }) =>
-        containers.map(({ description, name, status }: {description: string, name: string, status: string}) => ({ description, name, status })));
-*/
-    public listAll(): FutureData<any> {
-        //return this.api.baseUrl;
-        return futureFetch<any>("get", "http://localhost:5000/instances")
-        .map((data) => data )}
+    
+    public listAll(): FutureData<Container[]> {
+        return futureFetch<{containers: Container[]}>("get", "http://localhost:5000/instances").map(({ containers }) => containers);
+    }
+
+    public listProjects(): FutureData<any> {
+        //data.name
+        return futureFetch<any>("get", "http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects").map(data => data);
+    }
+    
+    public listRepoArtifacts(project: string): FutureData<any> {
+        //data.name
+        return futureFetch<any>("get", `http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects/${project}/repositories/dhis2-data/artifacts`).map(data => data);
+    }
+
+    public start(name: string): FutureData<void> {
+       const dataToSend = JSON.stringify(
+        {
+            image: name,
+            port: 8080,
+            detach: true
+        },
+        null,
+        3
+    );
+        return futureFetch<any>("post", "http://localhost:5000/instances/start", {
+            body: dataToSend,
+        }).map(data => data);
+    }
+
+    public stop(name: string): FutureData<void> {
+       const dataToSend = JSON.stringify(
+        {
+            image: name,
+            port: 8080,
+            detach: true
+        },
+        null,
+        3
+    );
+        return futureFetch<any>("post", "http://localhost:5000/instances/stop", {
+            body: dataToSend,
+        }).map(({ containers }) => containers);
+    }
+}
+type ContainerStartStopResponse = {
+     container: {
+        name: string;
+        description: string;
+        status: ContainerStatus;
+        port: number;
+     };
+     status: string;
+    };
+export type Project = {
+    name: string;
+    chart_count: number;
+    creation_time: Date;
+    current_user_role_id: number;
+    current_user_role_ids: number[];
+    cve_allowlist: CveAllowlist;
+    metadata: Metadata;
+    owner_id: number;
+    owner_name: string;
+    project_id: number;
+    repo_count: number;
+    update_time: Date;
+}
+type CveAllowlist = {
+    creation_time: Date;
+    id: number;
+    items: string[];
+    project_id: number;
+    update_time: Date;
+}
+type Metadata  = {
+    public: string;
 }
 function buildParams(params?: Record<string, string | number | boolean>): string | undefined {
     if (!params) return undefined;
@@ -44,14 +115,17 @@ function futureFetch<Data>(
     const controller = new AbortController();
     const qs = buildParams(params);
     const url = `${path}${qs ? `?${qs}` : ""}`;
-    const fetchUrl = corsProxy ? addCORSProxy(url) : url;
+    const fetchUrl = url;
 
     return Future.fromComputation<string, Data>((resolve, reject) => {
         fetch(fetchUrl, {
             signal: controller.signal,
             method,
-            headers: {
+            headers: method === "post" ? {
                 "Content-Type": "application/json",
+                "x-requested-with": "XMLHttpRequest",
+                Authorization: bearer ? `Bearer ${bearer}` : "",
+            } : {
                 "x-requested-with": "XMLHttpRequest",
                 Authorization: bearer ? `Bearer ${bearer}` : "",
             },
@@ -83,6 +157,3 @@ function futureFetch<Data>(
     });
 }
 
-function addCORSProxy(url: string): string {
-    return url.replace(/^(.*?:\/\/)(.*)/, "$1dev.eyeseetea.com/cors/$2");
-}

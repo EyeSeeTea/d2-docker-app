@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-04T07:25:50.878Z\n"
-"PO-Revision-Date: 2022-04-04T07:25:50.878Z\n"
+"POT-Creation-Date: 2022-04-06T09:00:26.196Z\n"
+"PO-Revision-Date: 2022-04-06T09:00:26.196Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -15,6 +15,21 @@ msgid "Add"
 msgstr ""
 
 msgid "List"
+msgstr ""
+
+msgid "Production"
+msgstr ""
+
+msgid "UAT"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Project"
+msgstr ""
+
+msgid "dhis2-data"
 msgstr ""
 
 msgid "Back"
@@ -27,9 +42,6 @@ msgid "Hello {{name}}"
 msgstr ""
 
 msgid "Detail page"
-msgstr ""
-
-msgid "Name"
 msgstr ""
 
 msgid "Description"
@@ -51,6 +63,15 @@ msgid "Create new container"
 msgstr ""
 
 msgid "Ok"
+msgstr ""
+
+msgid "Error saving connection"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Cancel"
 msgstr ""
 
 msgid "Search by name"

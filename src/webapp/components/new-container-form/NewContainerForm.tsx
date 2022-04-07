@@ -10,11 +10,12 @@ import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React from "react";
 import { NewContainer } from "../../../domain/entities/Container";
-import { FormField } from "../../components/form/FormField";
+import { FormField } from "../form/FormField";
+import { ProjectFF } from "./components/ProjectFF";
 
 const useValidations = (field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } => {
     switch (field) {
-        case "name":
+        case "port":
         case "project":
         case "dhis2Data":
             return {
@@ -26,46 +27,26 @@ const useValidations = (field: NewContainerFormField): { validation?: (...args: 
     }
 };
 
-export const RenderNewContainerField: React.FC<{ row: number; field: NewContainerFormField; values: NewContainer }> = ({
-    values,
-    row,
+export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }> = ({
     field,
 }) => {
-    const name = `connections[${row}].${field}`;
+    const name = `container.${field}`;
     const { validation, props: validationProps = {} } = useValidations(field);
-
     const props = {
         name,
         placeholder: getNewContainerFieldName(field),
         validate: validation,
         ...validationProps,
     };
-
     switch (field) {
-        case "name":
-        case "dhis2Data":
-        case "project": {
+        case "name": 
+        case "port": {
             return <FormField {...props} component={InputFieldFF} />;
         }
-        /*case "dataEndpoint": {
-            const { martCode = "", environment = "UAT" } = values[row] ?? {};
-            const domain = getDomain(environment);
-            const url = `${domain}/${martCode}`;
-
-            return <FormField {...props} component={InputFieldFF} initialValue={url} />;
+        case "project": {
+         return <FormField {...props} component={ProjectFF} dhis2DataArtifactField={`container.dhis2Data`} />;
         }
-        case "environment": {
-            return (
-                <FormField
-                    {...props}
-                    options={[
-                        { label: i18n.t("Production"), value: "PROD" },
-                        { label: i18n.t("UAT"), value: "UAT" },
-                    ]}
-                    component={SingleSelectFieldFF}
-                />
-            );
-        }*/
+
         default:
             return null;
     }
@@ -73,9 +54,9 @@ export const RenderNewContainerField: React.FC<{ row: number; field: NewContaine
 
 export type NewContainerFormField = keyof NewContainer;
 
-export const fields: NewContainerFormField[] = ["name", "project", "dhis2Data"];
+export const fields: NewContainerFormField[] = ["project", "name", "port"];//, "project", "dhis2Data"
 
-export const requiredFields: NewContainerFormField[] = ["name", "project", "dhis2Data"];
+export const requiredFields: NewContainerFormField[] = ["dhis2Data", "port"]; //,"project",  "dhis2Data"
 
 export const getNewContainerName = (field: NewContainerFormField) => {
     switch (field) {
@@ -84,7 +65,9 @@ export const getNewContainerName = (field: NewContainerFormField) => {
         case "project":
             return i18n.t("Project");
         case "dhis2Data":
-            return i18n.t("dhis2-data");
+            return i18n.t("DHIS2 Data Artifact");
+        case "port":
+            return i18n.t("Port");
     }
 };
 
@@ -93,4 +76,3 @@ export const getNewContainerFieldName = (field: NewContainerFormField) => {
     const required = requiredFields.includes(field) ? "(*)" : undefined;
     return _.compact([name, required]).join(" ");
 };
-

@@ -1,10 +1,11 @@
 
-export type ContainerStatus = "STARTED" | "STOPPED";
+import { Ref } from "./Ref";
+export type ContainerStatus = "RUNNING" | "STOPPED";
 
-export interface Container {
+export interface Container extends Ref {
     name: string;
     description: string;
-    status: ContainerStatus; 
+    status: ContainerStatus;
 }
 
 export interface NewContainer {
