@@ -1,18 +1,11 @@
 import AbortController from "abort-controller";
 import _ from "lodash";
-import { D2Api } from "@eyeseetea/d2-api/2.34";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
-import { getD2APiFromInstance } from "../../utils/d2-api";
-import { Instance } from "../entities/Instance";
 import i18n from "../../locales";
 import { Container } from "../../domain/entities/Container";
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
-    private api: D2Api;
-    constructor(instance: Instance) {
-        this.api = getD2APiFromInstance(instance);
-    }
 
     public listAll(): FutureData<Container[]> {
         return futureFetch<{ containers: Container[] }>("get", "http://localhost:5000/instances").map(

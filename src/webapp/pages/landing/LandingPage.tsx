@@ -12,7 +12,7 @@ import {
     useSnackbar,
     ConfirmationDialog,
 } from "@eyeseetea/d2-ui-components";
-import { Form, Field } from "react-final-form";
+import { Form } from "react-final-form";
 import _ from "lodash";
 import { DialogContent } from "@material-ui/core";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";

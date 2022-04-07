@@ -4,7 +4,6 @@ import {
     createMinCharacterLength,
     hasValue,
     InputFieldFF,
-    SingleSelectFieldFF,
 } from "@dhis2/ui";
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
@@ -12,7 +11,7 @@ import React from "react";
 import { NewContainer } from "../../../domain/entities/Container";
 import { FormField } from "../form/FormField";
 import { ProjectFF } from "./components/ProjectFF";
-import { Dropzone, DropzoneRef } from "../dropzone/Dropzone";
+import { Dropzone } from "../dropzone/Dropzone";
 
 const useValidations = (field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } => {
     switch (field) {
