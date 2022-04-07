@@ -16,14 +16,14 @@ import { Dropzone, DropzoneRef } from "../dropzone/Dropzone";
 
 const useValidations = (field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } => {
     switch (field) {
-        case "port": 
-        return {
-            validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(4)),
-        };
-        case "dbPort": 
-        return {
-            validation: composeValidators(createMinCharacterLength(1), createMaxCharacterLength(4)),
-        };
+        case "port":
+            return {
+                validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(4)),
+            };
+        case "dbPort":
+            return {
+                validation: composeValidators(createMinCharacterLength(1), createMaxCharacterLength(4)),
+            };
         case "project":
         case "dhis2Data":
             return {
@@ -46,41 +46,24 @@ export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }>
     };
     switch (field) {
         case "name":
-        case "port": 
-        case "url": 
+        case "port":
+        case "url":
         case "dbPort":
-        case "deployPath": 
-        case "javaOpt":
-        {
+        case "deployPath":
+        case "javaOpt": {
             return <FormField {...props} component={InputFieldFF} />;
         }
         case "tomcatServerXml": {
-            return  <FormField
-            {...props}
-            component={Dropzone}
-            accept=".xml"
-        />
+            return <FormField {...props} component={Dropzone} accept=".xml" />;
         }
         case "dhisConf": {
-            return  <FormField
-            {...props}
-            component={Dropzone}
-            accept=".conf"
-        />
+            return <FormField {...props} component={Dropzone} accept=".conf" />;
         }
         case "runSql": {
-            return  <FormField
-            {...props}
-            component={Dropzone}
-            accept=".sql,.sql.gz,.dump"
-        />
+            return <FormField {...props} component={Dropzone} accept=".sql,.sql.gz,.dump" />;
         }
         case "runScript": {
-            return <FormField
-            {...props}
-            component={Dropzone}
-            accept=".sh"
-        />
+            return <FormField {...props} component={Dropzone} accept=".sh" />;
         }
         case "project": {
             return <FormField {...props} component={ProjectFF} dhis2DataArtifactField={`container.dhis2Data`} />;
@@ -93,8 +76,17 @@ export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }>
 
 export type NewContainerFormField = keyof NewContainer;
 
-export const fields: NewContainerFormField[] = [ "name", "port"]; //, "project", "dhis2Data"
-export const advancedFields: NewContainerFormField[] = ["url", "dbPort", "deployPath", "javaOpt", "tomcatServerXml", "dhisConf", "runSql", "runScript"]; //, "project", "dhis2Data"
+export const fields: NewContainerFormField[] = ["name", "port"]; //, "project", "dhis2Data"
+export const advancedFields: NewContainerFormField[] = [
+    "url",
+    "dbPort",
+    "deployPath",
+    "javaOpt",
+    "tomcatServerXml",
+    "dhisConf",
+    "runSql",
+    "runScript",
+]; //, "project", "dhis2Data"
 
 export const requiredFields: NewContainerFormField[] = ["dhis2Data", "port"]; //,"project",  "dhis2Data"
 

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-07T19:24:22.728Z\n"
-"PO-Revision-Date: 2022-04-07T19:24:22.728Z\n"
+"POT-Creation-Date: 2022-04-07T20:19:41.936Z\n"
+"PO-Revision-Date: 2022-04-07T20:19:41.936Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -15,6 +15,9 @@ msgid "Add"
 msgstr ""
 
 msgid "List"
+msgstr ""
+
+msgid "Drag and drop some files here, or click to select files"
 msgstr ""
 
 msgid "Name"
@@ -35,9 +38,6 @@ msgstr ""
 msgid "Database Port"
 msgstr ""
 
-msgid "Deploy Path"
-msgstr ""
-
 msgid "Java OPT (Gigabytes of RAM)"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgstr ""
 msgid "Run SQL"
 msgstr ""
 
-msgid "Run Script"
+msgid "Run Shell Script"
 msgstr ""
 
 msgid "Back"

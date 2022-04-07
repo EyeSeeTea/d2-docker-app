@@ -33,7 +33,6 @@ export const LandingPage: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
 
     const [rows, setRows] = useState<Container[]>([]);
-    console.log(rows);
     const [selection, setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -160,36 +159,39 @@ export const LandingPage: React.FC = React.memo(() => {
                 onSubmit={onSubmit}
                 render={({ handleSubmit, form, submitting, pristine }) => (
                     <ConfirmationDialog
-                isOpen={openCreateContainer}
-                title={i18n.t("Create new container")} 
-                maxWidth={"lg"}
-                fullWidth={true}
-            >
-                <DialogContent>
-                    <form onSubmit={handleSubmit}>
-                        {fields.map(field => (
-                            <Row key={`container-row-${field}`}>
-                                <Label>{getNewContainerFieldName(field)}</Label>
-                                <RenderNewContainerField field={field} />
-                            </Row>
-                        ))}
-                        <Button onClick={() => setShowAdvancedProperties(prev => !prev)}>Advanced properties</Button>
-                        {showAdvancedProperties && advancedFields.map(field => (
-                            <Row key={`container-row-${field}`}>
-                                <Label>{getNewContainerFieldName(field)}</Label>
-                                <RenderNewContainerField field={field} />
-                            </Row>
-                        ))}
-                        <ButtonsRow>
-                            <Button type="submit" primary disabled={submitting || pristine}>
-                                Submit
-                            </Button>
-                            <Button type="button" onClick={() => setOpenCreateContainer(false)}>
-                                Cancel
-                            </Button>
-                        </ButtonsRow>
-                    </form>
-                    </DialogContent>
+                        isOpen={openCreateContainer}
+                        title={i18n.t("Create new container")}
+                        maxWidth={"lg"}
+                        fullWidth={true}
+                    >
+                        <DialogContent>
+                            <form onSubmit={handleSubmit}>
+                                {fields.map(field => (
+                                    <Row key={`container-row-${field}`}>
+                                        <Label>{getNewContainerFieldName(field)}</Label>
+                                        <RenderNewContainerField field={field} />
+                                    </Row>
+                                ))}
+                                <Button onClick={() => setShowAdvancedProperties(prev => !prev)}>
+                                    Advanced properties
+                                </Button>
+                                {showAdvancedProperties &&
+                                    advancedFields.map(field => (
+                                        <Row key={`container-row-${field}`}>
+                                            <Label>{getNewContainerFieldName(field)}</Label>
+                                            <RenderNewContainerField field={field} />
+                                        </Row>
+                                    ))}
+                                <ButtonsRow>
+                                    <Button type="submit" primary disabled={submitting || pristine}>
+                                        Submit
+                                    </Button>
+                                    <Button type="button" onClick={() => setOpenCreateContainer(false)}>
+                                        Cancel
+                                    </Button>
+                                </ButtonsRow>
+                            </form>
+                        </DialogContent>
                     </ConfirmationDialog>
                 )}
             />

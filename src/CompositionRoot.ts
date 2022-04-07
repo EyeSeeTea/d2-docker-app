@@ -11,7 +11,6 @@ import { ListProjectsUseCase } from "./domain/usecases/ListProjectsUseCase";
 import { ListRepoArtifactsUseCase } from "./domain/usecases/ListRepoArtifactsUseCase";
 import { CreateContainerImageUseCase } from "./domain/usecases/CreateContainerImageUseCase";
 
-
 export function getCompositionRoot(instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const containerRepository = new ContainerD2DockerApiRepository(instance);
@@ -27,7 +26,7 @@ export function getCompositionRoot(instance: Instance) {
             stop: new StopContainerUseCase(containerRepository),
             listProjects: new ListProjectsUseCase(containerRepository),
             listArtifacts: new ListRepoArtifactsUseCase(containerRepository),
-            createImage: new CreateContainerImageUseCase(containerRepository)
+            createImage: new CreateContainerImageUseCase(containerRepository),
         }),
     };
 }

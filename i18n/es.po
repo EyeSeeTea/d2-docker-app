@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2022-04-07T19:24:22.728Z\n"
+"POT-Creation-Date: 2022-04-07T20:19:41.936Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,6 +16,9 @@ msgstr "Añadir"
 
 msgid "List"
 msgstr "Listar"
+
+msgid "Drag and drop some files here, or click to select files"
+msgstr ""
 
 msgid "Name"
 msgstr ""
@@ -35,9 +38,6 @@ msgstr ""
 msgid "Database Port"
 msgstr ""
 
-msgid "Deploy Path"
-msgstr ""
-
 msgid "Java OPT (Gigabytes of RAM)"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgstr ""
 msgid "Run SQL"
 msgstr ""
 
-msgid "Run Script"
+msgid "Run Shell Script"
 msgstr ""
 
 msgid "Back"

@@ -6,12 +6,8 @@ import { ContainerRepository } from "../../domain/repositories/ContainerReposito
 import { getD2APiFromInstance } from "../../utils/d2-api";
 import { Instance } from "../entities/Instance";
 import i18n from "../../locales";
-import { Container, ContainerStatus } from "../../domain/entities/Container";
-/*
-            {
-    "image": "docker.eyeseetea.com/eyeseetea/dhis2-data:2.33.6-sp-cpr-dev2", "port": 8080, "detach": true
-}
-        */
+import { Container } from "../../domain/entities/Container";
+
 export class ContainerD2DockerApiRepository implements ContainerRepository {
     private api: D2Api;
     constructor(instance: Instance) {
@@ -25,7 +21,6 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     }
 
     public listProjects(): FutureData<any> {
-        //data.name
         return futureFetch<any>(
             "get",
             "http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects"
@@ -33,14 +28,13 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     }
 
     public listRepoArtifacts(project: string): FutureData<any> {
-        //data.name
         return futureFetch<any>(
             "get",
             `http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects/${project}/repositories/dhis2-data/artifacts`
         ).map(data => data);
     }
     public createContainerImage(project: string, dhis2DataArtifact: string, name?: string): FutureData<any> {
-        //docker.eyeseetea.com/samaritans/dhis2-data:2.36.8-sp-ip-training
+        //example: docker.eyeseetea.com/samaritans/dhis2-data:2.36.8-sp-ip-training
         const dataToSend = JSON.stringify(
             {
                 image: `docker.eyeseetea.com/${project}/dhis2-data:${dhis2DataArtifact}`,
@@ -83,15 +77,7 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
         }).map(({ containers }) => containers);
     }
 }
-type ContainerStartStopResponse = {
-    container: {
-        name: string;
-        description: string;
-        status: ContainerStatus;
-        port: number;
-    };
-    status: string;
-};
+
 export type Project = {
     name: string;
     chart_count: number;
