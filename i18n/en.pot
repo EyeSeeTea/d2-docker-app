@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-06T09:00:26.196Z\n"
-"PO-Revision-Date: 2022-04-06T09:00:26.196Z\n"
+"POT-Creation-Date: 2022-04-07T19:24:22.728Z\n"
+"PO-Revision-Date: 2022-04-07T19:24:22.728Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -17,19 +17,40 @@ msgstr ""
 msgid "List"
 msgstr ""
 
-msgid "Production"
-msgstr ""
-
-msgid "UAT"
-msgstr ""
-
 msgid "Name"
 msgstr ""
 
 msgid "Project"
 msgstr ""
 
-msgid "dhis2-data"
+msgid "DHIS2 Data Artifact"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Database Port"
+msgstr ""
+
+msgid "Deploy Path"
+msgstr ""
+
+msgid "Java OPT (Gigabytes of RAM)"
+msgstr ""
+
+msgid "Tomcat Server XML"
+msgstr ""
+
+msgid "DHIS Conf"
+msgstr ""
+
+msgid "Run SQL"
+msgstr ""
+
+msgid "Run Script"
 msgstr ""
 
 msgid "Back"
@@ -60,18 +81,6 @@ msgid "Details"
 msgstr ""
 
 msgid "Create new container"
-msgstr ""
-
-msgid "Ok"
-msgstr ""
-
-msgid "Error saving connection"
-msgstr ""
-
-msgid "Save"
-msgstr ""
-
-msgid "Cancel"
 msgstr ""
 
 msgid "Search by name"

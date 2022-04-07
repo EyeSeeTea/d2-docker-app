@@ -7,59 +7,72 @@ import { useAppContext } from "../../../contexts/app-context";
 import { getNewContainerFieldName } from "../NewContainerForm";
 import { Project } from "../../../../data/repositories/ContainerD2DockerApiRepository";
 
-export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2DataArtifactField}) => {
+export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2DataArtifactField }) => {
     const { compositionRoot } = useAppContext();
     const { input: dhis2DataArtifactInput } = useField(dhis2DataArtifactField);
-   const [dataElements, setDataElements] = useState<{value: string, label: string}[]>([]);
-   const [artifactOptions, setArtifactOptions] = useState<{value: string, label: string}[]>([]);
-  
-   useEffect(() => {
-    compositionRoot.container.listProjects().run(data => setDataElements(data.map((item: Project) => item.name).map((name:string) => ({value: name, label: name}))), error => console.log("error"));
+    const [dataElements, setDataElements] = useState<{ value: string; label: string }[]>([]);
+    const [artifactOptions, setArtifactOptions] = useState<{ value: string; label: string }[]>([]);
+
+    useEffect(() => {
+        compositionRoot.container.listProjects().run(
+            data =>
+                setDataElements(
+                    data.map((item: Project) => item.name).map((name: string) => ({ value: name, label: name }))
+                ),
+            error => console.log("error")
+        );
     }, [compositionRoot, input]);
 
     useEffect(() => {
-        if(input.value.id) {
-            compositionRoot.container.listArtifacts(input.value.id).run((data: Artifact[])  => {
-                const extractedData = _.flatten(data.filter((item: Artifact) => Boolean(item.tags)).map((nonNullItem: Artifact) => nonNullItem.tags)).map((tag:Tag) => ({value: tag.name, label: tag.name}));
-                setArtifactOptions(extractedData)
-                
-            }, error => console.log("error"));
+        if (input.value.id) {
+            compositionRoot.container.listArtifacts(input.value.id).run(
+                (data: Artifact[]) => {
+                    const extractedData = _.flatten(
+                        data
+                            .filter((item: Artifact) => Boolean(item.tags))
+                            .map((nonNullItem: Artifact) => nonNullItem.tags)
+                    ).map((tag: Tag) => ({ value: tag.name, label: tag.name }));
+                    setArtifactOptions(extractedData);
+                },
+                error => console.log("error")
+            );
         }
     }, [compositionRoot, input.value.id]);
 
     useEffect(() => {
         dhis2DataArtifactInput.onChange(
-            artifactOptions && artifactOptions[0] ? { id: artifactOptions[0].value, name: artifactOptions[0].label } : undefined
+            artifactOptions && artifactOptions[0]
+                ? { id: artifactOptions[0].value, name: artifactOptions[0].label }
+                : undefined
         );
-    }, [artifactOptions]);    
+    }, [artifactOptions]);
 
-        const onChangeDataElement = useCallback(
-            ({ selected }) => {
-                const dataElement = dataElements.find(item => item.value === selected);
-                if (dataElement) {
-                    input.onChange({ id: dataElement.value, name: dataElement.label });
-                    dhis2DataArtifactInput.onChange(undefined);
-                }
-            },
-            [dataElements, input]
-        );
+    const onChangeDataElement = useCallback(
+        ({ selected }) => {
+            const dataElement = dataElements.find(item => item.value === selected);
+            if (dataElement) {
+                input.onChange({ id: dataElement.value, name: dataElement.label });
+                dhis2DataArtifactInput.onChange(undefined);
+            }
+        },
+        [dataElements, input]
+    );
 
-       const onChangeOptionCombo = useCallback(
-            ({ selected }) => {
-                const optionCombo = artifactOptions
-                    .find(item => item.value === selected)
-    
-                if (optionCombo) {
-                    dhis2DataArtifactInput.onChange({ id: optionCombo.value, name: optionCombo.label });
-                }
-            },
-            [dhis2DataArtifactInput]
-        );
+    const onChangeOptionCombo = useCallback(
+        ({ selected }) => {
+            const optionCombo = artifactOptions.find(item => item.value === selected);
+
+            if (optionCombo) {
+                dhis2DataArtifactInput.onChange({ id: optionCombo.value, name: optionCombo.label });
+            }
+        },
+        [dhis2DataArtifactInput]
+    );
 
     return (
         <React.Fragment>
             <SingleSelectField onChange={onChangeDataElement} selected={input.value.id}>
-            {dataElements.map(({ value, label }) => (
+                {dataElements.map(({ value, label }) => (
                     <SingleSelectOption value={value} label={label} key={value} />
                 ))}
             </SingleSelectField>
@@ -91,19 +104,19 @@ interface BuildHistory {
 interface ExtraAttrs {
     architecture: string;
     author: string;
-    config: Record<string, string[]>
+    config: Record<string, string[]>;
     created: Date;
     os: string;
 }
 interface Tag {
- artifact_id: string;
- id: string;
- immutable: boolean;
- name: string;
- pull_time: Date;
- push_time: Date;
- repository_id: number;
- signed: boolean;
+    artifact_id: string;
+    id: string;
+    immutable: boolean;
+    name: string;
+    pull_time: Date;
+    push_time: Date;
+    repository_id: number;
+    signed: boolean;
 }
 interface Artifact {
     additions_links: { build_history: BuildHistory };
@@ -122,5 +135,4 @@ interface Artifact {
     size: number;
     tags: Tag[];
     type: string;
-
 }

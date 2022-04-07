@@ -21,19 +21,26 @@ import DetailsIcon from "@material-ui/icons/Details";
 import StopIcon from "@material-ui/icons/Stop";
 import { useAppContext } from "../../contexts/app-context";
 import i18n from "../../../locales";
-import { fields, getNewContainerFieldName, RenderNewContainerField } from "../../components/new-container-form/NewContainerForm";
+import {
+    fields,
+    advancedFields,
+    getNewContainerFieldName,
+    RenderNewContainerField,
+} from "../../components/new-container-form/NewContainerForm";
 
 export const LandingPage: React.FC = React.memo(() => {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
 
     const [rows, setRows] = useState<Container[]>([]);
-    console.log(rows)
+    console.log(rows);
     const [selection, setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [refreshKey, setRefreshKey] = useState(0);
 
     const [openCreateContainer, setOpenCreateContainer] = useState<boolean>(false);
+    const [showAdvancedProperties, setShowAdvancedProperties] = useState<boolean>(false);
+
     const [initialNewContainer, setInitialNewContainer] = useState<NewContainer>({
         project: "",
         dhis2Data: "",
@@ -59,34 +66,42 @@ export const LandingPage: React.FC = React.memo(() => {
         { name: "status", text: i18n.t("Status") },
     ];
     //I could send the endpoint I want to call and the name so it can only be 1 endpoint
-    const startContainer = useCallback((selection: string[]) => {
-        setIsLoading(true);
-        if(selection && selection[0]) {
-            compositionRoot.container.start(selection[0]).run(data => {
-                snackbar.success("Image started successfully");
-                setRefreshKey(Math.random());
-            },
-            error => snackbar.error(error))
-        }
-        else {
-            setIsLoading(false);
-            return;
-        }
-    },[compositionRoot.container, snackbar]);
-    const stopContainer = useCallback((selection: string[]) => {
-        setIsLoading(true);
-        if(selection && selection[0]) {
-            compositionRoot.container.stop(selection[0]).run(data => {
-                snackbar.success("Image stopped successfully");
-                setRefreshKey(Math.random());
-            },
-            error => snackbar.error(error))
-        }
-        else {
-            setIsLoading(false);
-            return;
-        }
-    }, [compositionRoot.container, snackbar]);
+    const startContainer = useCallback(
+        (selection: string[]) => {
+            setIsLoading(true);
+            if (selection && selection[0]) {
+                compositionRoot.container.start(selection[0]).run(
+                    data => {
+                        snackbar.success("Image started successfully");
+                        setRefreshKey(Math.random());
+                    },
+                    error => snackbar.error(error)
+                );
+            } else {
+                setIsLoading(false);
+                return;
+            }
+        },
+        [compositionRoot.container, snackbar]
+    );
+    const stopContainer = useCallback(
+        (selection: string[]) => {
+            setIsLoading(true);
+            if (selection && selection[0]) {
+                compositionRoot.container.stop(selection[0]).run(
+                    data => {
+                        snackbar.success("Image stopped successfully");
+                        setRefreshKey(Math.random());
+                    },
+                    error => snackbar.error(error)
+                );
+            } else {
+                setIsLoading(false);
+                return;
+            }
+        },
+        [compositionRoot.container, snackbar]
+    );
 
     const actions = useMemo(
         (): TableAction<any>[] => [
@@ -118,64 +133,67 @@ export const LandingPage: React.FC = React.memo(() => {
         setIsLoading(true);
         compositionRoot.container.listAll().run(
             data => {
-                const processed = data.map(item => ({...item, id: item.name}))
-                setRows(processed)
-            }
-,
+                const processed = data.map(item => ({ ...item, id: item.name }));
+                setRows(processed);
+            },
             error => snackbar.error(error)
         );
         setIsLoading(false);
     }, [compositionRoot, snackbar, refreshKey]);
-    
-    const onSubmit = async (values: any) => {
-        
-        console.log("submitting new container");
-        console.log(values)
-        //setOpenCreateContainer(false);
-    }
 
-   /*
-         onCancel={() => setOpenCreateContainer(false)}
-                cancelText={i18n.t("Ok")}
-                                            <ConfirmationDialog
+    const onSubmit = async (values: any) => {
+        console.log("submitting new container");
+        console.log(values);
+        /*compositionRoot.container.createImage("eyeseetea", "2.34-WIDP-DEV").run(
+            data => {
+                snackbar.success("Image created successfully");
+                setRefreshKey(Math.random());
+            },
+            error => snackbar.error(error)
+        )*/
+        //setOpenCreateContainer(false);
+    };
+
+    return (
+        <div>
+            <Form
+                onSubmit={onSubmit}
+                render={({ handleSubmit, form, submitting, pristine }) => (
+                    <ConfirmationDialog
                 isOpen={openCreateContainer}
                 title={i18n.t("Create new container")} 
                 maxWidth={"lg"}
                 fullWidth={true}
             >
                 <DialogContent>
-                                            </DialogContent>
-            </ConfirmationDialog>
-   */
-    return (
-        <div>
-                    <Form
-      onSubmit={onSubmit}
-      render={({ handleSubmit, form, submitting, pristine }) => (
-        <form onSubmit={handleSubmit}>
-           {fields.map(field => (
-                <Row key={`container-row-${field}`}>
-                    <Label>{getNewContainerFieldName(field)}</Label>
-                    <RenderNewContainerField field={field} />
-                </Row>
-                                ))}
-          <div className="buttons">
-            <button type="submit" disabled={submitting || pristine}>
-              Submit
-            </button>
-            <button
-              type="button"
-              onClick={form.reset}
-              disabled={submitting || pristine}
-            >
-              Reset
-            </button>
-          </div>
-        </form>
-      )}
-    />
-                
-            
+                    <form onSubmit={handleSubmit}>
+                        {fields.map(field => (
+                            <Row key={`container-row-${field}`}>
+                                <Label>{getNewContainerFieldName(field)}</Label>
+                                <RenderNewContainerField field={field} />
+                            </Row>
+                        ))}
+                        <Button onClick={() => setShowAdvancedProperties(prev => !prev)}>Advanced properties</Button>
+                        {showAdvancedProperties && advancedFields.map(field => (
+                            <Row key={`container-row-${field}`}>
+                                <Label>{getNewContainerFieldName(field)}</Label>
+                                <RenderNewContainerField field={field} />
+                            </Row>
+                        ))}
+                        <ButtonsRow>
+                            <Button type="submit" primary disabled={submitting || pristine}>
+                                Submit
+                            </Button>
+                            <Button type="button" onClick={() => setOpenCreateContainer(false)}>
+                                Cancel
+                            </Button>
+                        </ButtonsRow>
+                    </form>
+                    </DialogContent>
+                    </ConfirmationDialog>
+                )}
+            />
+
             <ObjectsTable<Container>
                 rows={rows}
                 columns={columns}
