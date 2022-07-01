@@ -19,7 +19,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2Da
                 setDataElements(
                     data.map((item: Project) => item.name).map((name: string) => ({ value: name, label: name }))
                 ),
-            error => console.log("error")
+            error => console.error(error)
         );
     }, [compositionRoot, input]);
 
@@ -34,7 +34,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2Da
                     ).map((tag: Tag) => ({ value: tag.name, label: tag.name }));
                     setArtifactOptions(extractedData);
                 },
-                error => console.log("error")
+                error => console.error(error)
             );
         }
     }, [compositionRoot, input.value.id]);
@@ -45,7 +45,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2Da
                 ? { id: artifactOptions[0].value, name: artifactOptions[0].label }
                 : undefined
         );
-    }, [artifactOptions]);
+    }, [artifactOptions, dhis2DataArtifactInput]);
 
     const onChangeDataElement = useCallback(
         ({ selected }) => {
@@ -55,7 +55,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2Da
                 dhis2DataArtifactInput.onChange(undefined);
             }
         },
-        [dataElements, input]
+        [dataElements, input, dhis2DataArtifactInput]
     );
 
     const onChangeOptionCombo = useCallback(
@@ -66,7 +66,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, dhis2Da
                 dhis2DataArtifactInput.onChange({ id: optionCombo.value, name: optionCombo.label });
             }
         },
-        [dhis2DataArtifactInput]
+        [dhis2DataArtifactInput, artifactOptions]
     );
 
     return (

@@ -9,10 +9,13 @@ export interface DropzoneRef {
 }
 export const Dropzone = React.forwardRef(
     (props: DropzoneOptions | ComponentProps<ComponentType<any>>, ref: React.ForwardedRef<DropzoneRef>) => {
-        const onDrop = useCallback(acceptedFiles => {
-            //this is so react-final-form will take the file during the onChange
-            props.input.onChange(acceptedFiles);
-        }, []);
+        const onDrop = useCallback(
+            acceptedFiles => {
+                //this is so react-final-form will take the file during the onChange
+                props.input.onChange(acceptedFiles);
+            },
+            [props.input]
+        );
 
         const { getRootProps, getInputProps, acceptedFiles, open } = useDropzone({
             noClick: true,

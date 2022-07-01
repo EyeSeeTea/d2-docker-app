@@ -6,7 +6,6 @@ import i18n from "../../locales";
 import { Container } from "../../domain/entities/Container";
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
-
     public listAll(): FutureData<Container[]> {
         return futureFetch<{ containers: Container[] }>("get", "http://localhost:5000/instances").map(
             ({ containers }) => containers
@@ -26,7 +25,8 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
             `http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects/${project}/repositories/dhis2-data/artifacts`
         ).map(data => data);
     }
-    public createContainerImage(project: string, dhis2DataArtifact: string, name?: string): FutureData<any> {
+
+    public createContainerImage(project: string, dhis2DataArtifact: string, _name?: string): FutureData<any> {
         //example: docker.eyeseetea.com/samaritans/dhis2-data:2.36.8-sp-ip-training
         const dataToSend = JSON.stringify(
             {

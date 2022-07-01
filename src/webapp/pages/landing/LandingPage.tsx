@@ -1,19 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { Button, NoticeBox } from "@dhis2/ui";
+import { Button,  } from "@dhis2/ui";
 import {
     ObjectsTable,
     ObjectsTableDetailField,
-    RowConfig,
     TableAction,
     TableColumn,
     TableSelection,
-    TableState,
     useSnackbar,
     ConfirmationDialog,
 } from "@eyeseetea/d2-ui-components";
 import { Form } from "react-final-form";
-import _ from "lodash";
 import { DialogContent } from "@material-ui/core";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import { NewContainer, Container } from "../../../domain/entities/Container";
@@ -33,14 +30,14 @@ export const LandingPage: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
 
     const [rows, setRows] = useState<Container[]>([]);
-    const [selection, setSelection] = useState<TableSelection[]>([]);
+    const [selection, _setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [refreshKey, setRefreshKey] = useState(0);
 
     const [openCreateContainer, setOpenCreateContainer] = useState<boolean>(false);
     const [showAdvancedProperties, setShowAdvancedProperties] = useState<boolean>(false);
 
-    const [initialNewContainer, setInitialNewContainer] = useState<NewContainer>({
+    const [_initialNewContainer, _setInitialNewContainer] = useState<NewContainer>({
         project: "",
         dhis2Data: "",
         port: "8080",
@@ -70,7 +67,7 @@ export const LandingPage: React.FC = React.memo(() => {
             setIsLoading(true);
             if (selection && selection[0]) {
                 compositionRoot.container.start(selection[0]).run(
-                    data => {
+                    _data => {
                         snackbar.success("Image started successfully");
                         setRefreshKey(Math.random());
                     },
@@ -88,7 +85,7 @@ export const LandingPage: React.FC = React.memo(() => {
             setIsLoading(true);
             if (selection && selection[0]) {
                 compositionRoot.container.stop(selection[0]).run(
-                    data => {
+                    _data => {
                         snackbar.success("Image stopped successfully");
                         setRefreshKey(Math.random());
                     },
@@ -141,8 +138,8 @@ export const LandingPage: React.FC = React.memo(() => {
     }, [compositionRoot, snackbar, refreshKey]);
 
     const onSubmit = async (values: any) => {
-        console.log("submitting new container");
-        console.log(values);
+        console.debug("submitting new container");
+        console.debug(values);
         /*compositionRoot.container.createImage("eyeseetea", "2.34-WIDP-DEV").run(
             data => {
                 snackbar.success("Image created successfully");
@@ -227,6 +224,6 @@ const ButtonsRow = styled.div`
     margin-right: 9px;
 `;
 
-const Spacer = styled.span`
+const _Spacer = styled.span`
     flex-grow: 1;
 `;
