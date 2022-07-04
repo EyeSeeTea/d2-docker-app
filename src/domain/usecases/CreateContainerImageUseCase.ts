@@ -1,8 +1,7 @@
-import { UseCase } from "../../CompositionRoot";
 import { FutureData } from "../entities/Future";
 import { ContainerRepository } from "../repositories/ContainerRepository";
 
-export class CreateContainerImageUseCase implements UseCase {
+export class CreateContainerImageUseCase {
     constructor(private containerRepository: ContainerRepository) {}
 
     public execute(projectName: string, imageName: string): FutureData<void> {

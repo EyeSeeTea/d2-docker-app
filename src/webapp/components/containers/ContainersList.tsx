@@ -76,7 +76,7 @@ function useContainerLoader(options: { setIsLoading: (state: boolean) => void; r
     React.useEffect(() => {
         setIsLoading(true);
 
-        compositionRoot.container.getAll().run(
+        compositionRoot.container.getAll.execute().run(
             containers => {
                 setContainers(containers);
                 setIsLoading(false);
@@ -104,7 +104,7 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
         (ids: string[]) => {
             setIsLoading(true);
             if (ids && ids[0]) {
-                compositionRoot.container.start(ids[0]).run(
+                compositionRoot.container.start.execute(ids[0]).run(
                     _data => {
                         snackbar.success(i18n.t("Image started successfully"));
                         setRefreshKey(n => n + 1);
@@ -123,7 +123,7 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
         (ids: string[]) => {
             setIsLoading(true);
             if (ids && ids[0]) {
-                compositionRoot.container.stop(ids[0]).run(
+                compositionRoot.container.stop.execute(ids[0]).run(
                     _data => {
                         snackbar.success(i18n.t("Image stopped successfully"));
                         setRefreshKey(n => n + 1);

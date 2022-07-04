@@ -1,9 +1,8 @@
-import { UseCase } from "../../CompositionRoot";
 import { FutureData } from "../entities/Future";
 import { Project } from "../entities/Project";
 import { ContainerRepository } from "../repositories/ContainerRepository";
 
-export class ListProjectsUseCase implements UseCase {
+export class ListProjectsUseCase {
     constructor(private containerRepository: ContainerRepository) {}
 
     public execute(): FutureData<Project[]> {

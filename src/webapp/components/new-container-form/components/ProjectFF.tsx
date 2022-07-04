@@ -18,7 +18,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
     const [artifactOptions, setArtifactOptions] = useState<{ value: string; label: string }[]>([]);
 
     useEffect(() => {
-        compositionRoot.container.getProjects().run(
+        compositionRoot.container.getProjects.execute().run(
             data =>
                 setProjects(
                     data
@@ -34,7 +34,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
 
     useEffect(() => {
         if (input.value.id) {
-            compositionRoot.container.getImages(input.value.id).run(
+            compositionRoot.container.getImages.execute(input.value.id).run(
                 images => {
                     const options = images.map(tag => ({ value: tag.name, label: tag.name }));
                     setArtifactOptions(options);
