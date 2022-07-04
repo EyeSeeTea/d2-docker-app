@@ -9,8 +9,9 @@ import {
     TableSelection,
     useSnackbar,
     ConfirmationDialog,
+    TableInitialState,
 } from "@eyeseetea/d2-ui-components";
-import { Form } from "react-final-form";
+import { Form, FormProps } from "react-final-form";
 import { DialogContent } from "@material-ui/core";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import { NewContainer, Container } from "../../../domain/entities/Container";
@@ -24,6 +25,7 @@ import {
     RenderNewContainerField,
 } from "../../components/new-container-form/NewContainerForm";
 import i18n from "../../../utils/i18n";
+import { useBooleanState } from "../../hooks/useBoolean";
 
 export const LandingPage: React.FC = React.memo(() => {
     const { compositionRoot } = useAppContext();
@@ -34,7 +36,7 @@ export const LandingPage: React.FC = React.memo(() => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [refreshKey, setRefreshKey] = useState(0);
 
-    const [openCreateContainer, setOpenCreateContainer] = useState<boolean>(false);
+    const [isContainerFormOpen, { enable: openContainerForm, disable: closeContainerForm }] = useBooleanState(false);
     const [showAdvancedProperties, setShowAdvancedProperties] = useState<boolean>(false);
 
     const [_initialNewContainer, _setInitialNewContainer] = useState<NewContainer>({
@@ -45,23 +47,18 @@ export const LandingPage: React.FC = React.memo(() => {
     });
 
     const columns = useMemo(
-        (): TableColumn<any>[] => [
+        (): TableColumn<Container>[] => [
             { name: "name", text: i18n.t("Name"), sortable: true },
-            { name: "description", text: i18n.t("Description"), sortable: true },
-            {
-                name: "status",
-                text: i18n.t("Status"),
-                sortable: true,
-            },
+            { name: "status", text: i18n.t("Status"), sortable: true },
         ],
         []
     );
-    const details: ObjectsTableDetailField<any>[] = [
+
+    const details: ObjectsTableDetailField<Container>[] = [
         { name: "name", text: i18n.t("Name") },
-        { name: "description", text: i18n.t("Description") },
         { name: "status", text: i18n.t("Status") },
     ];
-    //I could send the endpoint I want to call and the name so it can only be 1 endpoint
+
     const startContainer = useCallback(
         (selection: string[]) => {
             setIsLoading(true);
@@ -80,6 +77,7 @@ export const LandingPage: React.FC = React.memo(() => {
         },
         [compositionRoot.container, snackbar]
     );
+
     const stopContainer = useCallback(
         (selection: string[]) => {
             setIsLoading(true);
@@ -100,7 +98,7 @@ export const LandingPage: React.FC = React.memo(() => {
     );
 
     const actions = useMemo(
-        (): TableAction<any>[] => [
+        (): TableAction<Container>[] => [
             {
                 name: "start",
                 text: i18n.t("Start container"),
@@ -137,8 +135,8 @@ export const LandingPage: React.FC = React.memo(() => {
         setIsLoading(false);
     }, [compositionRoot, snackbar, refreshKey]);
 
-    const onSubmit = async (values: any) => {
-        console.debug("submitting new container");
+    const onSubmit = React.useCallback<FormProps["onSubmit"]>(async values => {
+        console.debug("TODO: submit new container");
         console.debug(values);
         /*compositionRoot.container.createImage("eyeseetea", "2.34-WIDP-DEV").run(
             data => {
@@ -148,7 +146,7 @@ export const LandingPage: React.FC = React.memo(() => {
             error => snackbar.error(error)
         )*/
         //setOpenCreateContainer(false);
-    };
+    }, []);
 
     return (
         <div>
@@ -156,7 +154,7 @@ export const LandingPage: React.FC = React.memo(() => {
                 onSubmit={onSubmit}
                 render={({ handleSubmit, form, submitting, pristine }) => (
                     <ConfirmationDialog
-                        isOpen={openCreateContainer}
+                        isOpen={isContainerFormOpen}
                         title={i18n.t("Create new container")}
                         maxWidth={"lg"}
                         fullWidth={true}
@@ -170,7 +168,7 @@ export const LandingPage: React.FC = React.memo(() => {
                                     </Row>
                                 ))}
                                 <Button onClick={() => setShowAdvancedProperties(prev => !prev)}>
-                                    Advanced properties
+                                    {i18n.t("Advanced properties")}
                                 </Button>
                                 {showAdvancedProperties &&
                                     advancedFields.map(field => (
@@ -181,10 +179,10 @@ export const LandingPage: React.FC = React.memo(() => {
                                     ))}
                                 <ButtonsRow>
                                     <Button type="submit" primary disabled={submitting || pristine}>
-                                        Submit
+                                        {i18n.t("Submit")}
                                     </Button>
-                                    <Button type="button" onClick={() => setOpenCreateContainer(false)}>
-                                        Cancel
+                                    <Button type="button" onClick={closeContainerForm}>
+                                        {i18n.t("Cancel")}
                                     </Button>
                                 </ButtonsRow>
                             </form>
@@ -196,17 +194,19 @@ export const LandingPage: React.FC = React.memo(() => {
             <ObjectsTable<Container>
                 rows={rows}
                 columns={columns}
+                initialState={initialState}
                 forceSelectionColumn={true}
                 loading={isLoading}
                 selection={selection}
                 actions={actions}
                 details={details}
                 searchBoxLabel={i18n.t("Search by name")}
-                onActionButtonClick={() => setOpenCreateContainer(true)}
+                onActionButtonClick={openContainerForm}
             />
         </div>
     );
 });
+
 const Row = styled.div`
     margin: 20px 0;
 `;
@@ -224,6 +224,6 @@ const ButtonsRow = styled.div`
     margin-right: 9px;
 `;
 
-const _Spacer = styled.span`
-    flex-grow: 1;
-`;
+const initialState: TableInitialState<Container> = {
+    sorting: { field: "status", order: "asc" },
+};

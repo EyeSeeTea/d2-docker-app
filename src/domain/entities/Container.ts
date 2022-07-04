@@ -3,7 +3,6 @@ export type ContainerStatus = "RUNNING" | "STOPPED";
 
 export interface Container extends Ref {
     name: string;
-    description: string;
     status: ContainerStatus;
 }
 
