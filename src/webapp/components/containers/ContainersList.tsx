@@ -13,6 +13,7 @@ import StopIcon from "@material-ui/icons/Stop";
 import _ from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
 import { Container } from "../../../domain/entities/Container";
+import { FutureData } from "../../../domain/entities/Future";
 import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { useBooleanState } from "../../hooks/useBoolean";
@@ -100,42 +101,43 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
     const snackbar = useSnackbar();
     const [refreshKey, setRefreshKey] = useState(0);
 
+    const runAction = useCallback(
+        (options: { msg: string; action: () => FutureData<void> }) => {
+            const { msg, action } = options;
+            setIsLoading(true);
+            action().run(
+                () => {
+                    snackbar.success(msg);
+                    setRefreshKey(n => n + 1);
+                    setIsLoading(false);
+                },
+                error => {
+                    snackbar.error(error);
+                    setIsLoading(false);
+                }
+            );
+        },
+        [snackbar, setIsLoading]
+    );
+
     const startContainer = useCallback(
         (ids: string[]) => {
-            setIsLoading(true);
-            if (ids && ids[0]) {
-                compositionRoot.container.start.execute(ids[0]).run(
-                    _data => {
-                        snackbar.success(i18n.t("Image started successfully"));
-                        setRefreshKey(n => n + 1);
-                    },
-                    error => snackbar.error(error)
-                );
-            } else {
-                setIsLoading(false);
-                return;
-            }
+            runAction({
+                msg: i18n.t("Image(s) started successfully"),
+                action: () => compositionRoot.container.start.execute(ids),
+            });
         },
-        [compositionRoot.container, snackbar, setIsLoading]
+        [compositionRoot, runAction]
     );
 
     const stopContainer = useCallback(
         (ids: string[]) => {
-            setIsLoading(true);
-            if (ids && ids[0]) {
-                compositionRoot.container.stop.execute(ids[0]).run(
-                    _data => {
-                        snackbar.success(i18n.t("Image stopped successfully"));
-                        setRefreshKey(n => n + 1);
-                    },
-                    error => snackbar.error(error)
-                );
-            } else {
-                setIsLoading(false);
-                return;
-            }
+            runAction({
+                msg: i18n.t("Image(s) stopped successfully"),
+                action: () => compositionRoot.container.stop.execute(ids),
+            });
         },
-        [compositionRoot.container, snackbar, setIsLoading]
+        [compositionRoot, runAction]
     );
 
     const actions: TableAction<Container>[] = [
@@ -145,7 +147,7 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
             multiple: true,
             icon: <PlayArrowIcon />,
             onClick: startContainer,
-            isActive: containers => _(containers).some(container => container.status === "STOPPED"),
+            isActive: containers => _(containers).every(container => container.status === "STOPPED"),
         },
         {
             name: "stop",
@@ -153,7 +155,7 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
             multiple: true,
             icon: <StopIcon />,
             onClick: stopContainer,
-            isActive: containers => _(containers).some(container => container.status === "RUNNING"),
+            isActive: containers => _(containers).every(container => container.status === "RUNNING"),
         },
         {
             name: "details",

@@ -46,6 +46,7 @@ export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }>
 
     switch (field) {
         case "name":
+            return <FormField {...props} component={InputFieldFF} initialValue="initial" />;
         case "port":
         case "url":
         case "dbPort":
@@ -88,7 +89,7 @@ export const advancedFields: NewContainerFormField[] = [
     "runScript",
 ];
 
-export const requiredFields: NewContainerFormField[] = ["image", "port"];
+export const requiredFields: NewContainerFormField[] = ["project", "image", "name", "port"];
 
 export const getNewContainerName = (field: NewContainerFormField) => {
     switch (field) {

@@ -46,33 +46,25 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
     }, []);
 
     return (
-        <Form
-            onSubmit={onSubmit}
-            render={({ handleSubmit, submitting, pristine }) => (
-                <ConfirmationDialog
-                    isOpen={isContainerFormOpen}
-                    title={i18n.t("Create new container")}
-                    maxWidth="lg"
-                    fullWidth={true}
-                >
-                    <DialogContent>
+        <ConfirmationDialog
+            isOpen={isContainerFormOpen}
+            title={i18n.t("Create new container")}
+            maxWidth="lg"
+            fullWidth={true}
+        >
+            <DialogContent>
+                <Form
+                    onSubmit={onSubmit}
+                    render={({ handleSubmit, submitting, pristine }) => (
                         <form onSubmit={handleSubmit}>
                             {fields.map(field => (
-                                <Row key={`container-row-${field}`}>
-                                    <Label>{getNewContainerFieldName(field)}</Label>
-                                    <RenderNewContainerField field={field} />
-                                </Row>
+                                <Field key={field} field={field} />
                             ))}
 
                             <Button onClick={toggleAdvancedProperties}>{i18n.t("Advanced properties")}</Button>
 
-                            {showAdvancedProperties &&
-                                advancedFields.map(field => (
-                                    <Row key={`container-row-${field}`}>
-                                        <Label>{getNewContainerFieldName(field)}</Label>
-                                        <RenderNewContainerField field={field} />
-                                    </Row>
-                                ))}
+                            {showAdvancedProperties && advancedFields.map(field => <Field key={field} field={field} />)}
+
                             <ButtonsRow>
                                 <Button type="submit" primary disabled={submitting || pristine}>
                                     {i18n.t("Submit")}
@@ -83,10 +75,10 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
                                 </Button>
                             </ButtonsRow>
                         </form>
-                    </DialogContent>
-                </ConfirmationDialog>
-            )}
-        />
+                    )}
+                />
+            </DialogContent>
+        </ConfirmationDialog>
     );
 });
 
@@ -106,3 +98,14 @@ const ButtonsRow = styled.div`
     padding-top: 10px;
     margin-right: 9px;
 `;
+
+const Field: React.FC<{ field: keyof NewContainer }> = props => {
+    const { field } = props;
+
+    return (
+        <Row key={`container-row-${field}`}>
+            <Label>{getNewContainerFieldName(field)}</Label>
+            <RenderNewContainerField field={field} />
+        </Row>
+    );
+};

@@ -1,6 +1,7 @@
-import { Ref } from "./Ref";
+import { Id } from "./Ref";
 
-export interface Container extends Ref {
+export interface Container {
+    id: Id;
     name: string;
     status: ContainerStatus;
 }
