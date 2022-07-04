@@ -4,7 +4,7 @@ import { ListAllContainersUseCase } from "./domain/usecases/ListAllContainersUse
 import { StartContainerUseCase } from "./domain/usecases/StartContainerUseCase";
 import { StopContainerUseCase } from "./domain/usecases/StopContainerUseCase";
 import { ListProjectsUseCase } from "./domain/usecases/ListProjectsUseCase";
-import { ListRepoArtifactsUseCase } from "./domain/usecases/ListRepoArtifactsUseCase";
+import { GetImagesUseCase } from "./domain/usecases/GetImagesUseCase";
 import { CreateContainerImageUseCase } from "./domain/usecases/CreateContainerImageUseCase";
 
 export function getCompositionRoot() {
@@ -12,11 +12,11 @@ export function getCompositionRoot() {
 
     return {
         container: getExecute({
-            listAll: new ListAllContainersUseCase(containerRepository),
+            getAll: new ListAllContainersUseCase(containerRepository),
             start: new StartContainerUseCase(containerRepository),
             stop: new StopContainerUseCase(containerRepository),
-            listProjects: new ListProjectsUseCase(containerRepository),
-            listArtifacts: new ListRepoArtifactsUseCase(containerRepository),
+            getProjects: new ListProjectsUseCase(containerRepository),
+            getImages: new GetImagesUseCase(containerRepository),
             createImage: new CreateContainerImageUseCase(containerRepository),
         }),
     };

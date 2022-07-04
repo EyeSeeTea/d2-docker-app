@@ -7,6 +7,6 @@ export class ListAllContainersUseCase implements UseCase {
     constructor(private containerRepository: ContainerRepository) {}
 
     public execute(): FutureData<Container[]> {
-        return this.containerRepository.listAll();
+        return this.containerRepository.getAll();
     }
 }

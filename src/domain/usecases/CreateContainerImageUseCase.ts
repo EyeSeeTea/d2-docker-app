@@ -5,7 +5,7 @@ import { ContainerRepository } from "../repositories/ContainerRepository";
 export class CreateContainerImageUseCase implements UseCase {
     constructor(private containerRepository: ContainerRepository) {}
 
-    public execute(project: string, dhis2DataArtifact: string, name?: string): FutureData<void> {
-        return this.containerRepository.createContainerImage(project, dhis2DataArtifact, name);
+    public execute(projectName: string, imageName: string): FutureData<void> {
+        return this.containerRepository.createContainerImage(projectName, imageName);
     }
 }

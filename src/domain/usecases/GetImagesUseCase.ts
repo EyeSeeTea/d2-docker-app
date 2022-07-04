@@ -1,11 +1,12 @@
 import { UseCase } from "../../CompositionRoot";
 import { FutureData } from "../entities/Future";
+import { Image } from "../entities/Image";
 import { ContainerRepository } from "../repositories/ContainerRepository";
 
-export class ListRepoArtifactsUseCase implements UseCase {
+export class GetImagesUseCase implements UseCase {
     constructor(private containerRepository: ContainerRepository) {}
 
-    public execute(project: string): FutureData<any> {
-        return this.containerRepository.listRepoArtifacts(project);
+    public execute(project: string): FutureData<Image[]> {
+        return this.containerRepository.getImages(project);
     }
 }

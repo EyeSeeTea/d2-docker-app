@@ -1,14 +1,15 @@
 import { Ref } from "./Ref";
-export type ContainerStatus = "RUNNING" | "STOPPED";
 
 export interface Container extends Ref {
     name: string;
     status: ContainerStatus;
 }
 
+export type ContainerStatus = "RUNNING" | "STOPPED";
+
 export interface NewContainer {
     project: string;
-    dhis2Data: string;
+    image: string;
     port: string;
     name: string;
     url?: string;

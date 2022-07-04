@@ -24,7 +24,7 @@ const useValidations = (field: NewContainerFormField): { validation?: (...args: 
                 validation: composeValidators(createMinCharacterLength(1), createMaxCharacterLength(4)),
             };
         case "project":
-        case "dhis2Data":
+        case "image":
             return {
                 validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(255)),
             };
@@ -43,6 +43,7 @@ export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }>
         validate: validation,
         ...validationProps,
     };
+
     switch (field) {
         case "name":
         case "port":
@@ -65,9 +66,8 @@ export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }>
             return <FormField {...props} component={Dropzone} accept=".sh" />;
         }
         case "project": {
-            return <FormField {...props} component={ProjectFF} dhis2DataArtifactField={`container.dhis2Data`} />;
+            return <FormField {...props} component={ProjectFF} imageField={`container.image`} />;
         }
-
         default:
             return null;
     }
@@ -75,7 +75,8 @@ export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }>
 
 export type NewContainerFormField = keyof NewContainer;
 
-export const fields: NewContainerFormField[] = ["name", "port"]; //, "project", "dhis2Data"
+export const fields: NewContainerFormField[] = ["project", "name", "port"];
+
 export const advancedFields: NewContainerFormField[] = [
     "url",
     "dbPort",
@@ -85,9 +86,9 @@ export const advancedFields: NewContainerFormField[] = [
     "dhisConf",
     "runSql",
     "runScript",
-]; //, "project", "dhis2Data"
+];
 
-export const requiredFields: NewContainerFormField[] = ["dhis2Data", "port"]; //,"project",  "dhis2Data"
+export const requiredFields: NewContainerFormField[] = ["image", "port"];
 
 export const getNewContainerName = (field: NewContainerFormField) => {
     switch (field) {
@@ -95,8 +96,8 @@ export const getNewContainerName = (field: NewContainerFormField) => {
             return i18n.t("Name");
         case "project":
             return i18n.t("Project");
-        case "dhis2Data":
-            return i18n.t("DHIS2 Data Artifact");
+        case "image":
+            return i18n.t("Image");
         case "port":
             return i18n.t("Port");
         case "url":

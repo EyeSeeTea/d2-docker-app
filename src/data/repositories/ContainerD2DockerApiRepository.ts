@@ -4,33 +4,40 @@ import { Future, FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
 import { Container } from "../../domain/entities/Container";
 import i18n from "../../utils/i18n";
+import { Image } from "../../domain/entities/Image";
+import { Project } from "../../domain/entities/Project";
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
-    public listAll(): FutureData<Container[]> {
-        return futureFetch<{ containers: Container[] }>("get", "http://localhost:5000/instances").map(
-            ({ containers }) => containers
+    public getAll(): FutureData<Container[]> {
+        return futureFetch<InstancesGetResponse>("get", "http://localhost:5000/instances").map(({ containers }) =>
+            containers.map(apiContainer => ({ ...apiContainer, id: apiContainer.name }))
         );
     }
 
-    public listProjects(): FutureData<any> {
-        return futureFetch<any>(
+    public getProjects(): FutureData<Project[]> {
+        return futureFetch<HarborProject[]>(
             "get",
             "http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects"
-        ).map(data => data);
+        );
     }
 
-    public listRepoArtifacts(project: string): FutureData<any> {
-        return futureFetch<any>(
+    public getImages(project: string): FutureData<Image[]> {
+        return futureFetch<Artifact[]>(
             "get",
             `http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects/${project}/repositories/dhis2-data/artifacts`
-        ).map(data => data);
+        ).map(artifacts =>
+            _(artifacts)
+                .flatMap(artifcat => (artifcat.type === "IMAGE" ? artifcat.tags : []))
+                .map(tag => ({ name: tag.name }))
+                .compact()
+                .value()
+        );
     }
 
-    public createContainerImage(project: string, dhis2DataArtifact: string, _name?: string): FutureData<any> {
-        //example: docker.eyeseetea.com/samaritans/dhis2-data:2.36.8-sp-ip-training
+    public createContainerImage(projectName: string, imageName: string): FutureData<void> {
         const dataToSend = JSON.stringify(
             {
-                image: `docker.eyeseetea.com/${project}/dhis2-data:${dhis2DataArtifact}`,
+                image: `docker.eyeseetea.com/${projectName}/dhis2-data:${imageName}`,
             },
             null,
             3
@@ -50,9 +57,9 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
             null,
             3
         );
-        return futureFetch<any>("post", "http://localhost:5000/instances/start", {
+        return futureFetch("post", "http://localhost:5000/instances/start", {
             body: dataToSend,
-        }).map(data => data);
+        });
     }
 
     public stop(name: string): FutureData<void> {
@@ -65,36 +72,35 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
             null,
             3
         );
-        return futureFetch<any>("post", "http://localhost:5000/instances/stop", {
+        return futureFetch("post", "http://localhost:5000/instances/stop", {
             body: dataToSend,
-        }).map(({ containers }) => containers);
+        });
     }
 }
 
-export type Project = {
+interface HarborProject {
     name: string;
     chart_count: number;
     creation_time: Date;
     current_user_role_id: number;
     current_user_role_ids: number[];
     cve_allowlist: CveAllowlist;
-    metadata: Metadata;
+    metadata: { public: string };
     owner_id: number;
     owner_name: string;
     project_id: number;
     repo_count: number;
     update_time: Date;
-};
-type CveAllowlist = {
+}
+
+interface CveAllowlist {
     creation_time: Date;
     id: number;
     items: string[];
     project_id: number;
     update_time: Date;
-};
-type Metadata = {
-    public: string;
-};
+}
+
 function buildParams(params?: Record<string, string | number | boolean>): string | undefined {
     if (!params) return undefined;
     return _.map(params, (value, key) => `$${key}=${value}`).join("&");
@@ -158,4 +164,59 @@ function futureFetch<Data>(
         if (corsProxy) return Future.error(err);
         return futureFetch<Data>(method, path, { ...options, corsProxy: true });
     });
+}
+
+interface ApiContainer {
+    name: string;
+    description: string;
+    status: "RUNNING" | "STOPPED";
+}
+
+interface InstancesGetResponse {
+    containers: ApiContainer[];
+}
+
+interface BuildHistory {
+    absolute: boolean;
+    href: string;
+}
+
+interface ExtraAttrs {
+    architecture: string;
+    author: string;
+    config: Record<string, string[]>;
+    created: Date;
+    os: string;
+}
+
+interface Tag {
+    artifact_id: string;
+    id: string;
+    immutable: boolean;
+    name: string;
+    pull_time: Date;
+    push_time: Date;
+    repository_id: number;
+    signed: boolean;
+}
+
+type Artifact = ImageArtifact | { type: "UNKNOWN" };
+
+interface ImageArtifact {
+    additions_links: { build_history: BuildHistory };
+    digest: string;
+    extra_attrs: ExtraAttrs;
+    icon: string;
+    id: number;
+    labels: string[] | null;
+    manifest_media_type: string;
+    media_type: string;
+    project_id: number;
+    pull_time: Date;
+    push_time: Date;
+    references: string[] | null;
+    repository_id: number;
+    size: number;
+    tags: Tag[];
+    type: "IMAGE";
 }
