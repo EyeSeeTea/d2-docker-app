@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { Button,  } from "@dhis2/ui";
+import { Button } from "@dhis2/ui";
 import {
     ObjectsTable,
     ObjectsTableDetailField,
@@ -17,13 +17,13 @@ import { NewContainer, Container } from "../../../domain/entities/Container";
 import DetailsIcon from "@material-ui/icons/Details";
 import StopIcon from "@material-ui/icons/Stop";
 import { useAppContext } from "../../contexts/app-context";
-import i18n from "../../../locales";
 import {
     fields,
     advancedFields,
     getNewContainerFieldName,
     RenderNewContainerField,
 } from "../../components/new-container-form/NewContainerForm";
+import i18n from "../../../utils/i18n";
 
 export const LandingPage: React.FC = React.memo(() => {
     const { compositionRoot } = useAppContext();

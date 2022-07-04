@@ -3,7 +3,7 @@ import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
 import { Container } from "../../domain/entities/Container";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
     public listAll(): FutureData<Container[]> {

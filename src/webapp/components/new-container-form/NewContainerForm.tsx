@@ -11,7 +11,7 @@ import { NewContainer } from "../../../domain/entities/Container";
 import { FormField } from "../form/FormField";
 import { ProjectFF } from "./components/ProjectFF";
 import { Dropzone } from "../dropzone/Dropzone";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 
 const useValidations = (field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } => {
     switch (field) {

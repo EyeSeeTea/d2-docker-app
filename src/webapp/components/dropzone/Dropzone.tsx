@@ -1,7 +1,7 @@
 import React, { ComponentProps, ComponentType, useImperativeHandle, useCallback } from "react";
 import { DropzoneOptions, DropzoneRootProps, useDropzone } from "react-dropzone";
 import styled from "styled-components";
-import i18n from "@eyeseetea/d2-ui-components/locales";
+import i18n from "../../../utils/i18n";
 
 export interface DropzoneRef {
     openDialog: () => void;
