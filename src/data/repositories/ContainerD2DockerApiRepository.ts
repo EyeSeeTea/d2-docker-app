@@ -1,11 +1,10 @@
-import AbortController from "abort-controller";
 import _ from "lodash";
-import { Future, FutureData } from "../../domain/entities/Future";
+import { FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
 import { Container } from "../../domain/entities/Container";
-import i18n from "../../utils/i18n";
 import { Image } from "../../domain/entities/Image";
 import { Project } from "../../domain/entities/Project";
+import { futureFetch } from "../utils/future-fetch";
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
     public getAll(): FutureData<Container[]> {
@@ -35,45 +34,32 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     }
 
     public createContainerImage(projectName: string, imageName: string): FutureData<void> {
-        const dataToSend = JSON.stringify(
-            {
-                image: `docker.eyeseetea.com/${projectName}/dhis2-data:${imageName}`,
-            },
-            null,
-            3
-        );
-        return futureFetch<any>("post", "http://localhost:5000/instances/pull", {
-            body: dataToSend,
-        }).map(data => data);
+        const dataToSend: D2DockerPullRequest = {
+            image: `docker.eyeseetea.com/${projectName}/dhis2-data:${imageName}`,
+        };
+
+        return futureFetch<void, D2DockerPullRequest>("post", "http://localhost:5000/instances/pull", {
+            data: dataToSend,
+        });
     }
 
     public start(name: string): FutureData<void> {
-        const dataToSend = JSON.stringify(
-            {
-                image: name,
-                port: 8080,
-                detach: true,
-            },
-            null,
-            3
-        );
-        return futureFetch("post", "http://localhost:5000/instances/start", {
-            body: dataToSend,
+        const dataToSend: D2DockerStartRequest = {
+            image: name,
+            port: 8080,
+            detach: true,
+        };
+
+        return futureFetch<void, D2DockerStartRequest>("post", "http://localhost:5000/instances/start", {
+            data: dataToSend,
         });
     }
 
     public stop(name: string): FutureData<void> {
-        const dataToSend = JSON.stringify(
-            {
-                image: name,
-                port: 8080,
-                detach: true,
-            },
-            null,
-            3
-        );
-        return futureFetch("post", "http://localhost:5000/instances/stop", {
-            body: dataToSend,
+        const dataToSend: D2DockerStopRequest = { image: name };
+
+        return futureFetch<void, D2DockerStopRequest>("post", "http://localhost:5000/instances/stop", {
+            data: dataToSend,
         });
     }
 }
@@ -99,71 +85,6 @@ interface CveAllowlist {
     items: string[];
     project_id: number;
     update_time: Date;
-}
-
-function buildParams(params?: Record<string, string | number | boolean>): string | undefined {
-    if (!params) return undefined;
-    return _.map(params, (value, key) => `$${key}=${value}`).join("&");
-}
-
-function futureFetch<Data>(
-    method: "get" | "post",
-    path: string,
-    options: {
-        body?: string;
-        textResponse?: boolean;
-        params?: Record<string, string | number | boolean>;
-        bearer?: string;
-        corsProxy?: boolean;
-    } = {}
-): FutureData<Data> {
-    const { body, textResponse = false, params, bearer, corsProxy = process.env.NODE_ENV === "development" } = options;
-    const controller = new AbortController();
-    const qs = buildParams(params);
-    const url = `${path}${qs ? `?${qs}` : ""}`;
-    const fetchUrl = url;
-
-    return Future.fromComputation<string, Data>((resolve, reject) => {
-        fetch(fetchUrl, {
-            signal: controller.signal,
-            method,
-            headers:
-                method === "post"
-                    ? {
-                          "Content-Type": "application/json",
-                          "x-requested-with": "XMLHttpRequest",
-                          Authorization: bearer ? `Bearer ${bearer}` : "",
-                      }
-                    : {
-                          "x-requested-with": "XMLHttpRequest",
-                          Authorization: bearer ? `Bearer ${bearer}` : "",
-                      },
-            body,
-        })
-            .then(async response => {
-                if (!response.ok) {
-                    reject(
-                        i18n.t(`API error code: {{statusText}} ({{status}})`, {
-                            nsSeparator: false,
-                            statusText: response.statusText,
-                            status: response.status,
-                        })
-                    );
-                } else if (textResponse) {
-                    const text = await response.text();
-                    resolve(text as unknown as Data);
-                } else {
-                    const json = await response.json();
-                    resolve(json);
-                }
-            })
-            .catch(err => reject(err ? err.message : "Unknown error"));
-
-        return controller.abort;
-    }).flatMapError(err => {
-        if (corsProxy) return Future.error(err);
-        return futureFetch<Data>(method, path, { ...options, corsProxy: true });
-    });
 }
 
 interface ApiContainer {
@@ -219,4 +140,18 @@ interface ImageArtifact {
     size: number;
     tags: Tag[];
     type: "IMAGE";
+}
+
+interface D2DockerPullRequest {
+    image: string;
+}
+
+interface D2DockerStartRequest {
+    image: string;
+    port: number;
+    detach: boolean;
+}
+
+interface D2DockerStopRequest {
+    image: string;
 }
