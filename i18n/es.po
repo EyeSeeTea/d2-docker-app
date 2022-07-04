@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2022-07-04T09:33:00.839Z\n"
+"POT-Creation-Date: 2022-07-04T13:03:21.071Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,16 +17,49 @@ msgstr "Añadir"
 msgid "List"
 msgstr "Listar"
 
-msgid "Drag and drop some files here, or click to select files"
+msgid "Create new container"
+msgstr ""
+
+msgid "Advanced properties"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Search by name"
 msgstr ""
 
 msgid "Name"
 msgstr ""
 
+msgid "Status"
+msgstr ""
+
+msgid "Image(s) started successfully"
+msgstr ""
+
+msgid "Image(s) stopped successfully"
+msgstr ""
+
+msgid "Start container"
+msgstr ""
+
+msgid "Stop container"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Drag and drop some files here, or click to select files"
+msgstr ""
+
 msgid "Project"
 msgstr ""
 
-msgid "DHIS2 Data Artifact"
+msgid "Image"
 msgstr ""
 
 msgid "Port"
@@ -67,25 +100,4 @@ msgid "Hello {{name}}"
 msgstr "Hola {{name}}"
 
 msgid "Detail page"
-msgstr ""
-
-msgid "Description"
-msgstr ""
-
-msgid "Status"
-msgstr ""
-
-msgid "Start container"
-msgstr ""
-
-msgid "Stop container"
-msgstr ""
-
-msgid "Details"
-msgstr ""
-
-msgid "Create new container"
-msgstr ""
-
-msgid "Search by name"
 msgstr ""
