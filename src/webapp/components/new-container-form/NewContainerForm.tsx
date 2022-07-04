@@ -5,13 +5,13 @@ import {
     hasValue,
     InputFieldFF,
 } from "@dhis2/ui";
-import i18n from "@eyeseetea/d2-ui-components/locales";
 import _ from "lodash";
 import React from "react";
 import { NewContainer } from "../../../domain/entities/Container";
 import { FormField } from "../form/FormField";
 import { ProjectFF } from "./components/ProjectFF";
 import { Dropzone } from "../dropzone/Dropzone";
+import i18n from "../../../locales";
 
 const useValidations = (field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } => {
     switch (field) {
@@ -104,7 +104,9 @@ export const getNewContainerName = (field: NewContainerFormField) => {
         case "dbPort":
             return i18n.t("Database Port");
         case "deployPath":
-            return i18n.t("Deploy Path Namespace (i.e: `dhis2` serves `http://localhost:8080/dhis2`)");
+            return i18n.t("Deploy Path Namespace (i.e: `dhis2` serves `http://localhost:8080/dhis2`)", {
+                nsSeparator: false,
+            });
         case "javaOpt":
             return i18n.t("Java OPT (Gigabytes of RAM)");
         case "tomcatServerXml":

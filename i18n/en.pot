@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-04-07T20:19:41.936Z\n"
-"PO-Revision-Date: 2022-04-07T20:19:41.936Z\n"
+"POT-Creation-Date: 2022-07-04T09:33:00.839Z\n"
+"PO-Revision-Date: 2022-07-04T09:33:00.839Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -36,6 +36,9 @@ msgid "URL"
 msgstr ""
 
 msgid "Database Port"
+msgstr ""
+
+msgid "Deploy Path Namespace (i.e: `dhis2` serves `http://localhost:8080/dhis2`)"
 msgstr ""
 
 msgid "Java OPT (Gigabytes of RAM)"

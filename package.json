@@ -15,16 +15,14 @@
         "@dhis2/d2-i18n-extract": "1.0.8",
         "@dhis2/d2-i18n-generate": "1.2.0",
         "@dhis2/ui": "6.12.0",
-        "@eyeseetea/d2-api": "1.11.0",
         "@eyeseetea/d2-ui-components": "2.6.11",
         "@material-ui/core": "4.12.3",
         "@material-ui/icons": "4.11.2",
         "@material-ui/lab": "4.0.0-alpha.60",
         "@material-ui/styles": "4.11.4",
+        "abort-controller": "^3.0.0",
         "axios": "0.21.1",
         "classnames": "2.3.1",
-        "d2": "31.10.2",
-        "d2-manifest": "1.0.0",
         "fluture": "14.0.0",
         "font-awesome": "4.7.0",
         "lodash": "4.17.21",
@@ -93,9 +91,9 @@
         "start": "react-scripts start",
         "start-profiling": "craco start",
         "postinstall": "yarn localize",
-        "prebuild": "yarn localize && yarn test",
-        "build-folder": "rm -rf build/ && d2-manifest package.json manifest.webapp && react-scripts build && yarn run manifest && cp -r i18n icon.png build",
-        "build": "yarn build-folder && rm -f $npm_package_name.zip && cd build && zip --quiet -r ../$npm_package_name.zip *",
+        "prebuild": "yarn localize",
+        "build": "rm -rf build/ && react-scripts build && cp manifest.webapp build && cp -r i18n icon.png build",
+        "build-zip": "yarn build-folder && rm -f $npm_package_name.zip && cd build && zip --quiet -r ../$npm_package_name.zip *",
         "test": "jest --passWithNoTests",
         "lint": "eslint src cypress --ext .js,.jsx,.ts,.tsx",
         "eject": "react-scripts eject",
@@ -103,27 +101,10 @@
         "extract-pot": "yarn d2-i18n-extract -p src/ -o i18n/",
         "localize": "yarn update-po && d2-i18n-generate -n d2-docker-app -p ./i18n/ -o ./src/locales/",
         "update-po": "yarn extract-pot && find i18n/ -name '*.po' -exec msgmerge --backup=off -U {} i18n/en.pot \\;",
-        "manifest": "d2-manifest package.json build/manifest.webapp",
         "cy:verify": "cypress verify",
         "cy:e2e:open": "NODE_ENV=test CYPRESS_E2E=true cypress open",
         "cy:e2e:run": "NODE_ENV=test CYPRESS_E2E=true cypress run --browser chrome",
         "prepare": "husky install",
         "script-example": "npx ts-node src/scripts/example.ts"
-    },
-    "manifest.webapp": {
-        "name": "D2 Docker App",
-        "description": "D2 Docker App for EFH Pilot",
-        "icons": {
-            "48": "icon.png"
-        },
-        "developer": {
-            "url": "https://www.eyeseetea.com/",
-            "name": "EyeSeeTea team"
-        },
-        "activities": {
-            "dhis": {
-                "href": "*"
-            }
-        }
     }
 }

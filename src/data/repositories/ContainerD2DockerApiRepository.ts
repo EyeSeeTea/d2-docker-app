@@ -2,8 +2,8 @@ import AbortController from "abort-controller";
 import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
-import i18n from "../../locales";
 import { Container } from "../../domain/entities/Container";
+import i18n from "../../locales";
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
     public listAll(): FutureData<Container[]> {
