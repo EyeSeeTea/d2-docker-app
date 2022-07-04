@@ -10,6 +10,7 @@ import {
 import DetailsIcon from "@material-ui/icons/Details";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
+import _ from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
 import { Container } from "../../../domain/entities/Container";
 import i18n from "../../../utils/i18n";
@@ -100,12 +101,12 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
     const [refreshKey, setRefreshKey] = useState(0);
 
     const startContainer = useCallback(
-        (selection: string[]) => {
+        (ids: string[]) => {
             setIsLoading(true);
-            if (selection && selection[0]) {
-                compositionRoot.container.start(selection[0]).run(
+            if (ids && ids[0]) {
+                compositionRoot.container.start(ids[0]).run(
                     _data => {
-                        snackbar.success("Image started successfully");
+                        snackbar.success(i18n.t("Image started successfully"));
                         setRefreshKey(n => n + 1);
                     },
                     error => snackbar.error(error)
@@ -119,13 +120,13 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
     );
 
     const stopContainer = useCallback(
-        (selection: string[]) => {
+        (ids: string[]) => {
             setIsLoading(true);
-            if (selection && selection[0]) {
-                compositionRoot.container.stop(selection[0]).run(
+            if (ids && ids[0]) {
+                compositionRoot.container.stop(ids[0]).run(
                     _data => {
-                        snackbar.success("Image stopped successfully");
-                        setRefreshKey(Math.random());
+                        snackbar.success(i18n.t("Image stopped successfully"));
+                        setRefreshKey(n => n + 1);
                     },
                     error => snackbar.error(error)
                 );
@@ -137,20 +138,22 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
         [compositionRoot.container, snackbar, setIsLoading]
     );
 
-    const actions = [
+    const actions: TableAction<Container>[] = [
         {
             name: "start",
             text: i18n.t("Start container"),
-            multiple: false,
+            multiple: true,
             icon: <PlayArrowIcon />,
             onClick: startContainer,
+            isActive: containers => _(containers).some(container => container.status === "STOPPED"),
         },
         {
             name: "stop",
             text: i18n.t("Stop container"),
-            multiple: false,
+            multiple: true,
             icon: <StopIcon />,
             onClick: stopContainer,
+            isActive: containers => _(containers).some(container => container.status === "RUNNING"),
         },
         {
             name: "details",
