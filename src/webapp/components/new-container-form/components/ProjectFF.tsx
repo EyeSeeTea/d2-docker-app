@@ -44,13 +44,14 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
         }
     }, [compositionRoot, input.value.id]);
 
+    const imageInputOnChange = imageInput.onChange;
     useEffect(() => {
-        imageInput.onChange(
+        imageInputOnChange(
             artifactOptions && artifactOptions[0]
                 ? { id: artifactOptions[0].value, name: artifactOptions[0].label }
                 : undefined
         );
-    }, [artifactOptions, imageInput]);
+    }, [artifactOptions, imageInputOnChange]);
 
     const onChange = useCallback<NonNullable<SingleSelectFieldProps["onChange"]>>(
         ({ selected }, ev) => {

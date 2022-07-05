@@ -13,41 +13,26 @@ import { ProjectFF } from "./components/ProjectFF";
 import { Dropzone } from "../dropzone/Dropzone";
 import i18n from "../../../utils/i18n";
 
-const useValidations = (field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } => {
-    switch (field) {
-        case "port":
-            return {
-                validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(4)),
-            };
-        case "dbPort":
-            return {
-                validation: composeValidators(createMinCharacterLength(1), createMaxCharacterLength(4)),
-            };
-        case "project":
-        case "image":
-            return {
-                validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(255)),
-            };
-        default: {
-            return { validation: requiredFields.includes(field) ? hasValue : undefined };
-        }
-    }
-};
+interface ContainerFieldProps {
+    field: NewContainerFormField;
+    container: NewContainer;
+}
 
-export const RenderNewContainerField: React.FC<{ field: NewContainerFormField }> = ({ field }) => {
+export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container }) => {
     const name = `container.${field}`;
     const { validation, props: validationProps = {} } = useValidations(field);
     const props = {
         name,
         placeholder: getNewContainerFieldName(field),
         validate: validation,
+        initialValue: container[field]?.toString(),
         ...validationProps,
     };
 
     switch (field) {
-        case "name":
-            return <FormField {...props} component={InputFieldFF} initialValue="initial" />;
         case "port":
+            return <FormField {...props} type="number" component={InputFieldFF} />;
+        case "name":
         case "url":
         case "dbPort":
         case "deployPath":
@@ -126,4 +111,35 @@ export const getNewContainerFieldName = (field: NewContainerFormField) => {
     const name = getNewContainerName(field);
     const required = requiredFields.includes(field) ? "(*)" : undefined;
     return _.compact([name, required]).join(" ");
+};
+
+function useValidations(field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } {
+    switch (field) {
+        case "port":
+            return {
+                validation: composeValidators(hasValue, minValue(1), maxValue(65535)),
+            };
+        case "dbPort":
+            return {
+                validation: composeValidators(createMinCharacterLength(1), createMaxCharacterLength(4)),
+            };
+        case "project":
+        case "image":
+            return {
+                validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(255)),
+            };
+        default: {
+            return { validation: requiredFields.includes(field) ? hasValue : undefined };
+        }
+    }
+}
+
+const minValue = (min: number) => (value0: unknown) => {
+    const value = parseFloat(value0 as string);
+    return isNaN(value) || value >= min ? undefined : i18n.t("Should be greater than {{min}}", { min });
+};
+
+const maxValue = (max: number) => (value0: unknown) => {
+    const value = parseFloat(value0 as string);
+    return isNaN(value) || value < max ? undefined : i18n.t("Should be smaller than {{max}}", { max });
 };

@@ -6,33 +6,26 @@ import {
     fields,
     advancedFields,
     getNewContainerFieldName,
-    RenderNewContainerField,
+    ContainerField,
 } from "../../components/new-container-form/NewContainerForm";
 import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
 import i18n from "../../../utils/i18n";
 import { useBooleanState } from "../../hooks/useBoolean";
 import styled from "styled-components";
-import { NewContainer } from "../../../domain/entities/Container";
+import { initialContainer, NewContainer } from "../../../domain/entities/Container";
 
 export interface ContainerFormProps {
     isOpen: boolean;
     close(): void;
+    container?: NewContainer;
 }
 
 export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
     const { isOpen: isContainerFormOpen, close: closeContainerForm } = props;
-
     const [showAdvancedProperties, { toggle: toggleAdvancedProperties }] = useBooleanState(false);
-
-    const [_initialNewContainer, _setInitialNewContainer] = React.useState<NewContainer>({
-        project: "",
-        image: "",
-        port: "8080",
-        name: "",
-    });
+    const container = props.container || initialContainer;
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(async values => {
-        console.debug("TODO: submit new container");
         console.debug(values);
 
         /*compositionRoot.container.createImage("eyeseetea", "2.34-WIDP-DEV").run(
@@ -58,12 +51,13 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
                     render={({ handleSubmit, submitting, pristine }) => (
                         <form onSubmit={handleSubmit}>
                             {fields.map(field => (
-                                <Field key={field} field={field} />
+                                <Field key={field} field={field} container={container} />
                             ))}
 
                             <Button onClick={toggleAdvancedProperties}>{i18n.t("Advanced properties")}</Button>
 
-                            {showAdvancedProperties && advancedFields.map(field => <Field key={field} field={field} />)}
+                            {showAdvancedProperties &&
+                                advancedFields.map(field => <Field key={field} field={field} container={container} />)}
 
                             <ButtonsRow>
                                 <Button type="submit" primary disabled={submitting || pristine}>
@@ -99,13 +93,13 @@ const ButtonsRow = styled.div`
     margin-right: 9px;
 `;
 
-const Field: React.FC<{ field: keyof NewContainer }> = props => {
-    const { field } = props;
+const Field: React.FC<{ field: keyof NewContainer; container: NewContainer }> = props => {
+    const { field, container } = props;
 
     return (
         <Row key={`container-row-${field}`}>
             <Label>{getNewContainerFieldName(field)}</Label>
-            <RenderNewContainerField field={field} />
+            <ContainerField field={field} container={container} />
         </Row>
     );
 };
