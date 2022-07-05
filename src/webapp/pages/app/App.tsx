@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import { SnackbarProvider } from "@eyeseetea/d2-ui-components";
-import { MuiThemeProvider } from "@material-ui/core/styles";
-//@ts-ignore
-import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import { appConfig } from "../../../app-config";
 import { getCompositionRoot } from "../../../CompositionRoot";
 import Share from "../../components/share/Share";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
 import "./App.css";
-import muiThemeLegacy from "./themes/dhis2-legacy.theme";
-import { muiTheme } from "./themes/dhis2.theme";
 
 export interface AppProps {}
 
@@ -35,18 +30,14 @@ export const App: React.FC<AppProps> = React.memo(function App() {
     if (loading) return null;
 
     return (
-        <MuiThemeProvider theme={muiTheme}>
-            <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
-                <SnackbarProvider>
-                    <div id="app" className="content">
-                        <AppContext.Provider value={appContext}>
-                            <Router />
-                        </AppContext.Provider>
-                    </div>
+        <SnackbarProvider>
+            <div id="app" className="content">
+                <AppContext.Provider value={appContext}>
+                    <Router />
+                </AppContext.Provider>
+            </div>
 
-                    <Share visible={showShareButton} />
-                </SnackbarProvider>
-            </OldMuiThemeProvider>
-        </MuiThemeProvider>
+            <Share visible={showShareButton} />
+        </SnackbarProvider>
     );
 });
