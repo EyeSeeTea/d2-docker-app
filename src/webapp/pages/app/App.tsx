@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
-import { SnackbarProvider } from "@eyeseetea/d2-ui-components";
+import { LoadingProvider, SnackbarProvider } from "@eyeseetea/d2-ui-components";
 import { appConfig } from "../../../app-config";
 import { getCompositionRoot } from "../../../CompositionRoot";
 import Share from "../../components/share/Share";
@@ -31,13 +31,15 @@ export const App: React.FC<AppProps> = React.memo(function App() {
 
     return (
         <SnackbarProvider>
-            <div id="app" className="content">
-                <AppContext.Provider value={appContext}>
-                    <Router />
-                </AppContext.Provider>
-            </div>
+            <LoadingProvider>
+                <div id="app" className="content">
+                    <AppContext.Provider value={appContext}>
+                        <Router />
+                    </AppContext.Provider>
+                </div>
 
-            <Share visible={showShareButton} />
+                <Share visible={showShareButton} />
+            </LoadingProvider>
         </SnackbarProvider>
     );
 });

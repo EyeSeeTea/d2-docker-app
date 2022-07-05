@@ -3,13 +3,23 @@ import _ from "lodash";
 import { Future, FutureData } from "../../domain/entities/Future";
 import i18n from "../../utils/i18n";
 
-export function futureFetch<ResponseData, RequestData = unknown>(
+type Params = Record<string, string | number | boolean>;
+
+export function fetchGet<ResponseData>(path: string, options: { params?: Params } = {}) {
+    return futureFetch<never, ResponseData>("get", path, options);
+}
+
+export function fetchPost<RequestData, ResponseData>(path: string, options: { params?: Params; data: RequestData }) {
+    return futureFetch<RequestData, ResponseData>("post", path, options);
+}
+
+function futureFetch<RequestData, ResponseData>(
     method: "get" | "post",
     path: string,
     options: {
         data?: RequestData;
         textResponse?: boolean;
-        params?: Record<string, string | number | boolean>;
+        params?: Params;
         bearer?: string;
         corsProxy?: boolean;
     } = {}
@@ -59,7 +69,7 @@ export function futureFetch<ResponseData, RequestData = unknown>(
         return controller.abort;
     }).flatMapError(err => {
         if (corsProxy) return Future.error(err);
-        return futureFetch<ResponseData>(method, path, { ...options, corsProxy: true });
+        return futureFetch<RequestData, ResponseData>(method, path, { ...options, corsProxy: true });
     });
 }
 

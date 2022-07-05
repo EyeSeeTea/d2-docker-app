@@ -1,66 +1,117 @@
 import _ from "lodash";
 import { FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
-import { Container } from "../../domain/entities/Container";
+import { Container, NewContainer } from "../../domain/entities/Container";
 import { Image } from "../../domain/entities/Image";
 import { Project } from "../../domain/entities/Project";
-import { futureFetch } from "../utils/future-fetch";
+import { fetchGet, fetchPost } from "../utils/future-fetch";
+
+function getImageFromRawName(name: string): Image | undefined {
+    const parts = name.split("/");
+    switch (parts.length) {
+        case 2: {
+            const [projectName = "", imageName = ""] = parts;
+            return { project: projectName, name: imageName };
+        }
+        case 3: {
+            const [_registryUrl = "", projectName = "", imageName = ""] = parts;
+            return { project: projectName, name: imageName };
+        }
+        default:
+            return undefined;
+    }
+}
 
 export class ContainerD2DockerApiRepository implements ContainerRepository {
     public getAll(): FutureData<Container[]> {
-        return futureFetch<InstancesGetResponse>("get", "http://localhost:5000/instances").map(({ containers }) =>
-            containers.map(apiContainer => ({ ...apiContainer, id: apiContainer.name }))
-        );
-    }
-
-    public getProjects(): FutureData<Project[]> {
-        return futureFetch<HarborProject[]>(
-            "get",
-            "http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects"
-        );
-    }
-
-    public getImages(project: string): FutureData<Image[]> {
-        return futureFetch<Artifact[]>(
-            "get",
-            `http://localhost:5000/harbor/https://docker.eyeseetea.com/api/v2.0/projects/${project}/repositories/dhis2-data/artifacts`
-        ).map(artifacts =>
-            _(artifacts)
-                .flatMap(artifcat => (artifcat.type === "IMAGE" ? artifcat.tags : []))
-                .map(tag => ({ name: tag.name }))
+        return fetchGet<InstancesGetResponse>(this.getD2DockerApiUrl("/instances")).map(({ containers }) =>
+            _(containers)
+                .map((apiContainer): Container | undefined => {
+                    const image = getImageFromRawName(apiContainer.name);
+                    return image
+                        ? { id: apiContainer.name, name: apiContainer.name, image, status: apiContainer.status }
+                        : undefined;
+                })
                 .compact()
                 .value()
         );
     }
 
-    public createContainerImage(projectName: string, imageName: string): FutureData<void> {
-        const dataToSend: D2DockerPullRequest = {
-            image: `docker.eyeseetea.com/${projectName}/dhis2-data:${imageName}`,
-        };
+    public getProjects(): FutureData<Project[]> {
+        return fetchGet<HarborProject[]>(this.getHarborApiUrl("projects"));
+    }
 
-        return futureFetch<void, D2DockerPullRequest>("post", "http://localhost:5000/instances/pull", {
-            data: dataToSend,
+    public getImages(project: string): FutureData<Image[]> {
+        return fetchGet<Artifact[]>(this.getHarborApiUrl(`/projects/${project}/repositories/dhis2-data/artifacts`)).map(
+            artifacts =>
+                _(artifacts)
+                    .flatMap(artifact => (artifact.type === "IMAGE" ? artifact.tags : []))
+                    .map(tag => ({ project, name: tag.name }))
+                    .compact()
+                    .value()
+        );
+    }
+
+    public pullImage(image: Image): FutureData<void> {
+        return fetchPost<D2DockerPullRequest, void>(this.getD2DockerApiUrl("/instances/pull"), {
+            data: {
+                image: this.getDockerImage(image),
+            },
         });
     }
 
-    public start(name: string): FutureData<void> {
-        const dataToSend: D2DockerStartRequest = {
-            image: name,
-            port: 8080,
-            detach: true,
-        };
-
-        return futureFetch<void, D2DockerStartRequest>("post", "http://localhost:5000/instances/start", {
-            data: dataToSend,
+    public pushImage(image: Image): FutureData<void> {
+        return fetchPost<D2DockerPushRequest, void>(this.getD2DockerApiUrl("/instances/push"), {
+            data: {
+                image: this.getDockerImage(image),
+            },
         });
     }
 
-    public stop(name: string): FutureData<void> {
-        const dataToSend: D2DockerStopRequest = { image: name };
+    public createImage(container: NewContainer): FutureData<void> {
+        const sourceImage: Image = { project: container.project, name: container.image };
+        const destImage: Image = { project: container.project, name: container.name };
 
-        return futureFetch<void, D2DockerStopRequest>("post", "http://localhost:5000/instances/stop", {
-            data: dataToSend,
+        return fetchPost<D2DockerCopyRequest, void>(this.getD2DockerApiUrl("/instances/copy"), {
+            data: {
+                source: this.getDockerImage(sourceImage),
+                destinations: [this.getDockerImage(destImage)],
+            },
         });
+    }
+
+    public start(container: NewContainer): FutureData<void> {
+        return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
+            data: {
+                image: this.getDockerImage({ project: container.project, name: container.name }),
+                port: parseInt(container.port),
+                detach: true,
+            },
+        });
+    }
+
+    public stop(image: Image): FutureData<void> {
+        return fetchPost<D2DockerStopRequest, void>(this.getD2DockerApiUrl("/instances/stop"), {
+            data: {
+                image: this.getDockerImage(image),
+            },
+        });
+    }
+
+    /* Private methods */
+
+    private getDockerImage(image: Image): string {
+        return `docker.eyeseetea.com/${image.project}/dhis2-data:${image.name}`;
+    }
+
+    private getD2DockerApiUrl(path: string): string {
+        const path2 = path.replace(/^\//, "");
+        return `http://localhost:5000/${path2}`;
+    }
+
+    private getHarborApiUrl(path: string): string {
+        const path2 = path.replace(/^\//, "");
+        return `${this.getD2DockerApiUrl("/harbor")}/https://docker.eyeseetea.com/api/v2.0/${path2}`;
     }
 }
 
@@ -144,6 +195,17 @@ interface ImageArtifact {
 
 interface D2DockerPullRequest {
     image: string;
+}
+
+interface D2DockerPushRequest {
+    image: string;
+}
+
+type DockerImage = string;
+
+interface D2DockerCopyRequest {
+    source: DockerImage;
+    destinations: DockerImage[];
 }
 
 interface D2DockerStartRequest {

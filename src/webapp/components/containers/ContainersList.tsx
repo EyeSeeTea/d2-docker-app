@@ -17,6 +17,7 @@ import { FutureData } from "../../../domain/entities/Future";
 import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { useBooleanState } from "../../hooks/useBoolean";
+import { Refresher, useRefresher } from "../../hooks/useRefresher";
 import { ContainerForm } from "./ContainerForm";
 
 export const ContainersList: React.FC = React.memo(() => {
@@ -25,15 +26,20 @@ export const ContainersList: React.FC = React.memo(() => {
 
     const columns = useMemo(getColumns, []);
     const details = getDetails();
-
-    const { actions, refreshKey } = useActions({ setIsLoading });
-    const rows = useContainerLoader({ setIsLoading, refreshKey });
+    const refresher = useRefresher();
+    const { actions } = useActions({ setIsLoading, refresher });
+    const rows = useContainerLoader({ setIsLoading, refresher });
 
     const [containerFormIsOpen, { enable: openContainerForm, disable: closeContainerForm }] = useBooleanState(false);
 
+    const closeFormAndReloadList = React.useCallback(() => {
+        closeContainerForm();
+        refresher.refresh();
+    }, [closeContainerForm, refresher.refresh]);
+
     return (
         <div>
-            <ContainerForm isOpen={containerFormIsOpen} close={closeContainerForm} />
+            <ContainerForm isOpen={containerFormIsOpen} close={closeFormAndReloadList} />
 
             <ObjectsTable<Container>
                 rows={rows}
@@ -68,8 +74,8 @@ function getColumns(): TableColumn<Container>[] {
     ];
 }
 
-function useContainerLoader(options: { setIsLoading: (state: boolean) => void; refreshKey: number }): Container[] {
-    const { setIsLoading, refreshKey } = options;
+function useContainerLoader(options: { setIsLoading: (state: boolean) => void; refresher: Refresher }): Container[] {
+    const { setIsLoading, refresher } = options;
     const [containers, setContainers] = useState<Container[]>([]);
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
@@ -87,19 +93,17 @@ function useContainerLoader(options: { setIsLoading: (state: boolean) => void; r
                 setIsLoading(false);
             }
         );
-    }, [compositionRoot, snackbar, refreshKey, setIsLoading]);
+    }, [compositionRoot, snackbar, refresher.value, setIsLoading]);
 
     return containers;
 }
 
-function useActions(options: { setIsLoading: (state: boolean) => void }): {
+function useActions(options: { setIsLoading: (state: boolean) => void; refresher: Refresher }): {
     actions: TableAction<Container>[];
-    refreshKey: number;
 } {
-    const { setIsLoading } = options;
+    const { setIsLoading, refresher } = options;
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
-    const [refreshKey, setRefreshKey] = useState(0);
 
     const runAction = useCallback(
         (options: { msg: string; action: () => FutureData<void> }) => {
@@ -108,7 +112,7 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
             action().run(
                 () => {
                     snackbar.success(msg);
-                    setRefreshKey(n => n + 1);
+                    refresher.refresh();
                     setIsLoading(false);
                 },
                 error => {
@@ -117,7 +121,7 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
                 }
             );
         },
-        [snackbar, setIsLoading]
+        [snackbar, setIsLoading, refresher.refresh]
     );
 
     const startContainer = useCallback(
@@ -165,5 +169,5 @@ function useActions(options: { setIsLoading: (state: boolean) => void }): {
         },
     ];
 
-    return { actions, refreshKey };
+    return { actions };
 }

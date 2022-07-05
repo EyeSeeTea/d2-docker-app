@@ -1,13 +1,16 @@
+import { Image } from "./Image";
 import { Id } from "./Ref";
 
 export interface Container {
     id: Id;
     name: string;
+    image: Image;
     status: ContainerStatus;
 }
 
 export type ContainerStatus = "RUNNING" | "STOPPED";
 
+// TODO: This is a ViewModel
 export interface NewContainer {
     project: string;
     image: string;

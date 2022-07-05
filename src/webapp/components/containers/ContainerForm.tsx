@@ -13,6 +13,9 @@ import i18n from "../../../utils/i18n";
 import { useBooleanState } from "../../hooks/useBoolean";
 import styled from "styled-components";
 import { initialContainer, NewContainer } from "../../../domain/entities/Container";
+import { useLoading } from "@eyeseetea/d2-ui-components";
+import { useSnackbar } from "@eyeseetea/d2-ui-components";
+import { useAppContext } from "../../contexts/app-context";
 
 export interface ContainerFormProps {
     isOpen: boolean;
@@ -24,19 +27,29 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
     const { isOpen: isContainerFormOpen, close: closeContainerForm } = props;
     const [showAdvancedProperties, { toggle: toggleAdvancedProperties }] = useBooleanState(false);
     const container = props.container || initialContainer;
+    const snackbar = useSnackbar();
+    const loading = useLoading();
+    const { compositionRoot } = useAppContext();
 
-    const onSubmit = React.useCallback<FormProps["onSubmit"]>(async values => {
-        console.debug(values);
+    const onSubmit = React.useCallback<FormProps["onSubmit"]>(
+        async values => {
+            const container = values as NewContainer;
 
-        /*compositionRoot.container.createImage("eyeseetea", "2.34-WIDP-DEV").run(
-            data => {
-                snackbar.success("Image created successfully");
-                setRefreshKey(Math.random());
-            },
-            error => snackbar.error(error)
-        )*/
-        //setOpenCreateContainer(false);
-    }, []);
+            loading.show(true, i18n.t("Pulling image"), 25);
+
+            return compositionRoot.container.createImage.execute(container).run(
+                () => {
+                    snackbar.success(i18n.t("Image created successfully"));
+                    closeContainerForm();
+                },
+                error => {
+                    loading.hide();
+                    snackbar.error(error);
+                }
+            );
+        },
+        [snackbar, loading, compositionRoot, closeContainerForm]
+    );
 
     return (
         <ConfirmationDialog
