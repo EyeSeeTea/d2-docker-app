@@ -33,8 +33,8 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
     }, [compositionRoot]);
 
     useEffect(() => {
-        if (input.value.id) {
-            compositionRoot.container.getImages.execute(input.value.id).run(
+        if (input.value) {
+            compositionRoot.container.getImages.execute(input.value).run(
                 images => {
                     const options = images.map(tag => ({ value: tag.name, label: tag.name }));
                     setArtifactOptions(options);
@@ -42,22 +42,18 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
                 error => console.error(error)
             );
         }
-    }, [compositionRoot, input.value.id]);
+    }, [compositionRoot, input.value]);
 
     const imageInputOnChange = imageInput.onChange;
     useEffect(() => {
-        imageInputOnChange(
-            artifactOptions && artifactOptions[0]
-                ? { id: artifactOptions[0].value, name: artifactOptions[0].label }
-                : undefined
-        );
+        imageInputOnChange(artifactOptions && artifactOptions[0] ? artifactOptions[0].value : undefined);
     }, [artifactOptions, imageInputOnChange]);
 
     const onChange = useCallback<NonNullable<SingleSelectFieldProps["onChange"]>>(
         ({ selected }, ev) => {
             const project = projects.find(item => item.value === selected);
             if (project && input.onChange) {
-                input.onChange({ id: project.value, name: project.label }, ev);
+                input.onChange(project.value, ev);
                 imageInput.onChange(undefined);
             }
         },
@@ -69,7 +65,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
             const optionCombo = artifactOptions.find(item => item.value === selected);
 
             if (optionCombo) {
-                imageInput.onChange({ id: optionCombo.value, name: optionCombo.label });
+                imageInput.onChange(optionCombo.value);
             }
         },
         [imageInput, artifactOptions]
@@ -77,17 +73,17 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageFi
 
     return (
         <React.Fragment>
-            <SingleSelectField onChange={onChange} selected={input.value.id}>
+            <SingleSelectField onChange={onChange} selected={input.value}>
                 {projects.map(({ value, label }) => (
                     <SingleSelectOption value={value} label={label} key={value} />
                 ))}
             </SingleSelectField>
 
-            {_(projects).some(({ value }) => value === input.value.id) && (
+            {_(projects).some(({ value }) => value === input.value) && (
                 <React.Fragment>
                     <Row>{getNewContainerFieldName("image")}</Row>
 
-                    <SingleSelectField onChange={onChangeOptionCombo} selected={imageInput.value.id}>
+                    <SingleSelectField onChange={onChangeOptionCombo} selected={imageInput.value}>
                         {artifactOptions.map(({ value, label }) => (
                             <SingleSelectOption value={value} label={label} key={value} />
                         ))}

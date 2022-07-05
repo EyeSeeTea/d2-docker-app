@@ -11,7 +11,7 @@ export type ContainerStatus = "RUNNING" | "STOPPED";
 export interface NewContainer {
     project: string;
     image: string;
-    port: number;
+    port: string;
     name: string;
     url?: string;
     dbPort?: string;
@@ -26,6 +26,6 @@ export interface NewContainer {
 export const initialContainer: NewContainer = {
     project: "",
     image: "",
-    port: 8080,
+    port: "8080",
     name: "",
 };

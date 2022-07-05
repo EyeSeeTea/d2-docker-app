@@ -1,10 +1,4 @@
-import {
-    composeValidators,
-    createMaxCharacterLength,
-    createMinCharacterLength,
-    hasValue,
-    InputFieldFF,
-} from "@dhis2/ui";
+import { composeValidators, hasValue, InputFieldFF } from "@dhis2/ui";
 import _ from "lodash";
 import React from "react";
 import { NewContainer } from "../../../domain/entities/Container";
@@ -31,10 +25,10 @@ export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container
 
     switch (field) {
         case "port":
+        case "dbPort":
             return <FormField {...props} type="number" component={InputFieldFF} />;
         case "name":
         case "url":
-        case "dbPort":
         case "deployPath":
         case "javaOpt": {
             return <FormField {...props} component={InputFieldFF} />;
@@ -117,16 +111,16 @@ function useValidations(field: NewContainerFormField): { validation?: (...args: 
     switch (field) {
         case "port":
             return {
-                validation: composeValidators(hasValue, minValue(1), maxValue(65535)),
+                validation: composeValidators(hasValue, validatePort()),
             };
         case "dbPort":
             return {
-                validation: composeValidators(createMinCharacterLength(1), createMaxCharacterLength(4)),
+                validation: composeValidators(validatePort()),
             };
         case "project":
         case "image":
             return {
-                validation: composeValidators(hasValue, createMinCharacterLength(1), createMaxCharacterLength(255)),
+                validation: composeValidators(hasValue),
             };
         default: {
             return { validation: requiredFields.includes(field) ? hasValue : undefined };
@@ -134,12 +128,16 @@ function useValidations(field: NewContainerFormField): { validation?: (...args: 
     }
 }
 
-const minValue = (min: number) => (value0: unknown) => {
-    const value = parseFloat(value0 as string);
-    return isNaN(value) || value >= min ? undefined : i18n.t("Should be greater than {{min}}", { min });
-};
+const validatePort = () => (strValue: unknown) => {
+    const value = parseFloat(strValue as string);
 
-const maxValue = (max: number) => (value0: unknown) => {
-    const value = parseFloat(value0 as string);
-    return isNaN(value) || value < max ? undefined : i18n.t("Should be smaller than {{max}}", { max });
+    if (isNaN(value)) {
+        return undefined;
+    } else if (value <= 0) {
+        return i18n.t("Port should be greater than 0");
+    } else if (value >= 65535) {
+        return i18n.t("Port should be smaller than 65535");
+    } else {
+        return undefined;
+    }
 };
