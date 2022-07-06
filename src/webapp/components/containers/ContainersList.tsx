@@ -5,6 +5,7 @@ import {
     TableColumn,
     TableInitialState,
     TableSelection,
+    useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 import DetailsIcon from "@material-ui/icons/Details";
@@ -14,6 +15,7 @@ import _ from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
 import { Container } from "../../../domain/entities/Container";
 import { FutureData } from "../../../domain/entities/Future";
+import { Id } from "../../../domain/entities/Ref";
 import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { useBooleanState } from "../../hooks/useBoolean";
@@ -27,15 +29,16 @@ export const ContainersList: React.FC = React.memo(() => {
     const columns = useMemo(getColumns, []);
     const details = getDetails();
     const refresher = useRefresher();
-    const { actions } = useActions({ setIsLoading, refresher });
     const rows = useContainerLoader({ setIsLoading, refresher });
+    const { actions } = useContainerActions({ setIsLoading, refresher, rows });
+    const { refresh } = refresher;
 
     const [containerFormIsOpen, { enable: openContainerForm, disable: closeContainerForm }] = useBooleanState(false);
 
     const closeFormAndReloadList = React.useCallback(() => {
         closeContainerForm();
-        refresher.refresh();
-    }, [closeContainerForm, refresher.refresh]);
+        refresh();
+    }, [closeContainerForm, refresh]);
 
     return (
         <div>
@@ -62,7 +65,13 @@ const initialState: TableInitialState<Container> = {
 
 function getDetails(): ObjectsTableDetailField<Container>[] {
     return [
-        { name: "name", text: i18n.t("Name") },
+        {
+            name: "name",
+            text: i18n.t("Name"),
+            getValue: container => {
+                return container.url ? <a href={container.url}>{container.id}</a> : container.id;
+            },
+        },
         { name: "status", text: i18n.t("Status") },
     ];
 }
@@ -74,7 +83,12 @@ function getColumns(): TableColumn<Container>[] {
     ];
 }
 
-function useContainerLoader(options: { setIsLoading: (state: boolean) => void; refresher: Refresher }): Container[] {
+interface UseContainerLoaderOptions {
+    setIsLoading: (state: boolean) => void;
+    refresher: Refresher;
+}
+
+function useContainerLoader(options: UseContainerLoaderOptions): Container[] {
     const { setIsLoading, refresher } = options;
     const [containers, setContainers] = useState<Container[]>([]);
     const { compositionRoot } = useAppContext();
@@ -98,50 +112,74 @@ function useContainerLoader(options: { setIsLoading: (state: boolean) => void; r
     return containers;
 }
 
-function useActions(options: { setIsLoading: (state: boolean) => void; refresher: Refresher }): {
+interface UseActionsOptions {
+    setIsLoading: (state: boolean) => void;
+    refresher: Refresher;
+    rows: Container[];
+}
+
+function useContainerActions(options: UseActionsOptions): {
     actions: TableAction<Container>[];
 } {
-    const { setIsLoading, refresher } = options;
+    const { setIsLoading, refresher, rows } = options;
+    const { refresh } = refresher;
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
+    const loading = useLoading();
 
     const runAction = useCallback(
-        (options: { msg: string; action: () => FutureData<void> }) => {
-            const { msg, action } = options;
-            setIsLoading(true);
+        (options: { actionMsg: string; successMsg: string; action: () => FutureData<void> }) => {
+            const { actionMsg, successMsg, action } = options;
+            loading.show(true, actionMsg);
             action().run(
                 () => {
-                    snackbar.success(msg);
-                    refresher.refresh();
+                    snackbar.success(successMsg);
+                    refresh();
+                    loading.hide();
                     setIsLoading(false);
                 },
                 error => {
                     snackbar.error(error);
+                    loading.hide();
                     setIsLoading(false);
                 }
             );
         },
-        [snackbar, setIsLoading, refresher.refresh]
+        [snackbar, setIsLoading, refresh, loading]
+    );
+
+    const getImages = React.useCallback(
+        (ids: Id[]) => {
+            return _(rows)
+                .keyBy(container => container.id)
+                .at(ids)
+                .compact()
+                .map(container => container.image)
+                .value();
+        },
+        [rows]
     );
 
     const startContainer = useCallback(
-        (ids: string[]) => {
+        (ids: Id[]) => {
             runAction({
-                msg: i18n.t("Image(s) started successfully"),
-                action: () => compositionRoot.container.start.execute(ids),
+                actionMsg: i18n.t("Starting container(s)") + ": " + ids.join(", "),
+                successMsg: i18n.t("Image(s) started successfully"),
+                action: () => compositionRoot.container.start.execute(getImages(ids)),
             });
         },
-        [compositionRoot, runAction]
+        [compositionRoot, runAction, getImages]
     );
 
     const stopContainer = useCallback(
-        (ids: string[]) => {
+        (ids: Id[]) => {
             runAction({
-                msg: i18n.t("Image(s) stopped successfully"),
-                action: () => compositionRoot.container.stop.execute(ids),
+                actionMsg: i18n.t("Stopping container(s)") + ": " + ids.join(", "),
+                successMsg: i18n.t("Image(s) stopped successfully"),
+                action: () => compositionRoot.container.stop.execute(getImages(ids)),
             });
         },
-        [compositionRoot, runAction]
+        [compositionRoot, runAction, getImages]
     );
 
     const actions: TableAction<Container>[] = [

@@ -1,21 +1,43 @@
 import _ from "lodash";
 import { FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
-import { Container, NewContainer } from "../../domain/entities/Container";
-import { Image } from "../../domain/entities/Image";
+import {
+    Container,
+    getImageFromContainer,
+    getImageInfoFromName,
+    getLocalImageFromContainer,
+    NewContainerValid,
+} from "../../domain/entities/Container";
+import { buildImage, defaultRegistryUrl, Image } from "../../domain/entities/Image";
 import { Project } from "../../domain/entities/Project";
 import { fetchGet, fetchPost } from "../utils/future-fetch";
+import {
+    InstancesGetResponse,
+    HarborProject,
+    Artifact,
+    D2DockerPullRequest,
+    D2DockerPushRequest,
+    D2DockerCopyRequest,
+    D2DockerStartRequest,
+    D2DockerStopRequest,
+} from "./D2DockerApi.types";
+
+const registryUrl = defaultRegistryUrl;
 
 function getImageFromRawName(name: string): Image | undefined {
     const parts = name.split("/");
+
     switch (parts.length) {
-        case 2: {
-            const [projectName = "", imageName = ""] = parts;
-            return { project: projectName, name: imageName };
-        }
         case 3: {
-            const [_registryUrl = "", projectName = "", imageName = ""] = parts;
-            return { project: projectName, name: imageName };
+            const [registryUrl = "", projectName = "", name = ""] = parts;
+            const name2 = name.split(":")[1];
+            if (!name2) return;
+            const sp = name2.split("-");
+            const version = sp[0];
+            const name3 = sp.slice(1).join("-");
+            return version && name3
+                ? buildImage({ registryUrl, project: projectName, dhis2Version: version, name: name3 })
+                : undefined;
         }
         default:
             return undefined;
@@ -28,8 +50,15 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
             _(containers)
                 .map((apiContainer): Container | undefined => {
                     const image = getImageFromRawName(apiContainer.name);
+
                     return image
-                        ? { id: apiContainer.name, name: apiContainer.name, image, status: apiContainer.status }
+                        ? {
+                              id: apiContainer.name,
+                              name: apiContainer.name,
+                              url: this.getHarborPublicUrl(image),
+                              image,
+                              status: apiContainer.status,
+                          }
                         : undefined;
                 })
                 .compact()
@@ -46,7 +75,9 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
             artifacts =>
                 _(artifacts)
                     .flatMap(artifact => (artifact.type === "IMAGE" ? artifact.tags : []))
-                    .map(tag => ({ project, name: tag.name }))
+                    .map(tag => getImageInfoFromName(tag.name))
+                    .compact()
+                    .map(attrs => buildImage({ registryUrl, project, ...attrs }))
                     .compact()
                     .value()
         );
@@ -68,9 +99,9 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
         });
     }
 
-    public createImage(container: NewContainer): FutureData<void> {
-        const sourceImage: Image = { project: container.project, name: container.image };
-        const destImage: Image = { project: container.project, name: container.name };
+    public createImage(container: NewContainerValid): FutureData<void> {
+        const sourceImage = getImageFromContainer(container);
+        const destImage = getLocalImageFromContainer(container);
 
         return fetchPost<D2DockerCopyRequest, void>(this.getD2DockerApiUrl("/instances/copy"), {
             data: {
@@ -80,12 +111,21 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
         });
     }
 
-    public start(container: NewContainer): FutureData<void> {
+    public start(image: Image): FutureData<void> {
         return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
             data: {
-                image: this.getDockerImage({ project: container.project, name: container.name }),
-                port: parseInt(container.port),
+                image: this.getDockerImage(image),
                 detach: true,
+            },
+        });
+    }
+
+    public startInitial(container: NewContainerValid): FutureData<void> {
+        return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
+            data: {
+                image: this.getDockerImage(getLocalImageFromContainer(container)),
+                detach: true,
+                port: parseInt(container.port),
             },
         });
     }
@@ -101,7 +141,9 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     /* Private methods */
 
     private getDockerImage(image: Image): string {
-        return `docker.eyeseetea.com/${image.project}/dhis2-data:${image.name}`;
+        const dhis2DataImageName = `dhis2-data:${image.dhis2Version}-${image.name}`;
+        const parts = [image.registryUrl, image.project, dhis2DataImageName];
+        return _.compact(parts).join("/");
     }
 
     private getD2DockerApiUrl(path: string): string {
@@ -111,109 +153,16 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
 
     private getHarborApiUrl(path: string): string {
         const path2 = path.replace(/^\//, "");
-        return `${this.getD2DockerApiUrl("/harbor")}/https://docker.eyeseetea.com/api/v2.0/${path2}`;
+        return `${this.getD2DockerApiUrl("/harbor")}/https://${registryUrl}/api/v2.0/${path2}`;
     }
-}
 
-interface HarborProject {
-    name: string;
-    chart_count: number;
-    creation_time: Date;
-    current_user_role_id: number;
-    current_user_role_ids: number[];
-    cve_allowlist: CveAllowlist;
-    metadata: { public: string };
-    owner_id: number;
-    owner_name: string;
-    project_id: number;
-    repo_count: number;
-    update_time: Date;
-}
+    private getHarborPublicUrl(image: Image): string | undefined {
+        if (image.registryUrl) {
+            const parts = [image.registryUrl, "harbor", "projects", image.project, "repositories", "dhis2-data"];
 
-interface CveAllowlist {
-    creation_time: Date;
-    id: number;
-    items: string[];
-    project_id: number;
-    update_time: Date;
-}
-
-interface ApiContainer {
-    name: string;
-    description: string;
-    status: "RUNNING" | "STOPPED";
-}
-
-interface InstancesGetResponse {
-    containers: ApiContainer[];
-}
-
-interface BuildHistory {
-    absolute: boolean;
-    href: string;
-}
-
-interface ExtraAttrs {
-    architecture: string;
-    author: string;
-    config: Record<string, string[]>;
-    created: Date;
-    os: string;
-}
-
-interface Tag {
-    artifact_id: string;
-    id: string;
-    immutable: boolean;
-    name: string;
-    pull_time: Date;
-    push_time: Date;
-    repository_id: number;
-    signed: boolean;
-}
-
-type Artifact = ImageArtifact | { type: "UNKNOWN" };
-
-interface ImageArtifact {
-    additions_links: { build_history: BuildHistory };
-    digest: string;
-    extra_attrs: ExtraAttrs;
-    icon: string;
-    id: number;
-    labels: string[] | null;
-    manifest_media_type: string;
-    media_type: string;
-    project_id: number;
-    pull_time: Date;
-    push_time: Date;
-    references: string[] | null;
-    repository_id: number;
-    size: number;
-    tags: Tag[];
-    type: "IMAGE";
-}
-
-interface D2DockerPullRequest {
-    image: string;
-}
-
-interface D2DockerPushRequest {
-    image: string;
-}
-
-type DockerImage = string;
-
-interface D2DockerCopyRequest {
-    source: DockerImage;
-    destinations: DockerImage[];
-}
-
-interface D2DockerStartRequest {
-    image: string;
-    port: number;
-    detach: boolean;
-}
-
-interface D2DockerStopRequest {
-    image: string;
+            return `https://${parts.join("/")}`;
+        } else {
+            return undefined;
+        }
+    }
 }

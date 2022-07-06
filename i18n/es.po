@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2022-07-05T09:17:55.129Z\n"
+"POT-Creation-Date: 2022-07-05T11:14:47.679Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,6 +16,12 @@ msgstr "Añadir"
 
 msgid "List"
 msgstr "Listar"
+
+msgid "Pulling image"
+msgstr ""
+
+msgid "Image created successfully"
+msgstr ""
 
 msgid "Create new container"
 msgstr ""
@@ -90,10 +96,10 @@ msgstr ""
 msgid "Run Shell Script"
 msgstr ""
 
-msgid "Should be greater than {{min}}"
+msgid "Port should be greater than 0"
 msgstr ""
 
-msgid "Should be smaller than {{max}}"
+msgid "Port should be smaller than 65535"
 msgstr ""
 
 msgid "Back"

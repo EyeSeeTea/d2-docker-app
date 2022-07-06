@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-07-05T09:17:55.129Z\n"
-"PO-Revision-Date: 2022-07-05T09:17:55.129Z\n"
+"POT-Creation-Date: 2022-07-05T11:14:47.679Z\n"
+"PO-Revision-Date: 2022-07-05T11:14:47.679Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -15,6 +15,12 @@ msgid "Add"
 msgstr ""
 
 msgid "List"
+msgstr ""
+
+msgid "Pulling image"
+msgstr ""
+
+msgid "Image created successfully"
 msgstr ""
 
 msgid "Create new container"
@@ -89,10 +95,10 @@ msgstr ""
 msgid "Run Shell Script"
 msgstr ""
 
-msgid "Should be greater than {{min}}"
+msgid "Port should be greater than 0"
 msgstr ""
 
-msgid "Should be smaller than {{max}}"
+msgid "Port should be smaller than 65535"
 msgstr ""
 
 msgid "Back"

@@ -45,8 +45,8 @@ export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container
         case "runScript": {
             return <FormField {...props} component={Dropzone} accept=".sh" />;
         }
-        case "project": {
-            return <FormField {...props} component={ProjectFF} imageField={`container.image`} />;
+        case "projectName": {
+            return <FormField {...props} component={ProjectFF} imageField="container.image" />;
         }
         default:
             return null;
@@ -55,7 +55,7 @@ export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container
 
 export type NewContainerFormField = keyof NewContainer;
 
-export const fields: NewContainerFormField[] = ["project", "name", "port"];
+export const fields: NewContainerFormField[] = ["projectName", "name", "port"];
 
 export const advancedFields: NewContainerFormField[] = [
     "url",
@@ -68,13 +68,13 @@ export const advancedFields: NewContainerFormField[] = [
     "runScript",
 ];
 
-export const requiredFields: NewContainerFormField[] = ["project", "image", "name", "port"];
+export const requiredFields: NewContainerFormField[] = ["projectName", "image", "name", "port"];
 
 export const getNewContainerName = (field: NewContainerFormField) => {
     switch (field) {
         case "name":
             return i18n.t("Name");
-        case "project":
+        case "projectName":
             return i18n.t("Project");
         case "image":
             return i18n.t("Image");
@@ -117,7 +117,7 @@ function useValidations(field: NewContainerFormField): { validation?: (...args: 
             return {
                 validation: composeValidators(validatePort()),
             };
-        case "project":
+        case "projectName":
         case "image":
             return {
                 validation: composeValidators(hasValue),

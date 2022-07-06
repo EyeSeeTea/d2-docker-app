@@ -17,7 +17,7 @@ export function getCompositionRoot() {
             stop: new StopContainerUseCase(containerRepository),
             getProjects: new ListProjectsUseCase(containerRepository),
             getImages: new GetImagesUseCase(containerRepository),
-            createImage: new CreateContainerImageUseCase(containerRepository),
+            createImageAndStart: new CreateContainerImageUseCase(containerRepository),
         },
     };
 }

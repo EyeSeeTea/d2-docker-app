@@ -116,3 +116,7 @@ export type Cancel = () => void;
 
 export type Computation<E, D> = (resolve: Fn<D>, reject: Fn<E>) => fluture.Cancel;
 export type FutureData<Data> = Future<string, Data>;
+
+export function initFuture(action: () => void): FutureData<void> {
+    return Future.success<void, string>(undefined).map(action);
+}

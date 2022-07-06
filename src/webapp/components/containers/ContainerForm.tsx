@@ -12,7 +12,7 @@ import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
 import i18n from "../../../utils/i18n";
 import { useBooleanState } from "../../hooks/useBoolean";
 import styled from "styled-components";
-import { initialContainer, NewContainer } from "../../../domain/entities/Container";
+import { initialContainer, NewContainer, NewContainerValid } from "../../../domain/entities/Container";
 import { useLoading } from "@eyeseetea/d2-ui-components";
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { useAppContext } from "../../contexts/app-context";
@@ -33,12 +33,16 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
         async values => {
-            const container = values as NewContainer;
+            const container = values.container as NewContainerValid;
 
-            loading.show(true, i18n.t("Pulling image"), 25);
+            const onProgress = (msg: string, progressPercent: number) => {
+                loading.show(true, msg);
+                loading.updateProgress(progressPercent);
+            };
 
-            return compositionRoot.container.createImage.execute(container).run(
+            return compositionRoot.container.createImageAndStart.execute(container, { onProgress }).run(
                 () => {
+                    loading.hide();
                     snackbar.success(i18n.t("Image created successfully"));
                     closeContainerForm();
                 },

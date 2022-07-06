@@ -1,8 +1,12 @@
 import { FinalFormInput, SingleSelectField, SingleSelectFieldProps, SingleSelectOption } from "@dhis2/ui";
+import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 import React, { useCallback, useState, useEffect } from "react";
 import { useField } from "react-final-form";
 import styled from "styled-components";
+import { initFuture } from "../../../../domain/entities/Future";
+import { Image } from "../../../../domain/entities/Image";
+import { Project } from "../../../../domain/entities/Project";
 import { useAppContext } from "../../../contexts/app-context";
 import { getNewContainerFieldName } from "../NewContainerForm";
 
@@ -11,80 +15,118 @@ export interface CategoryOptionComboFFProps {
     imageField: string;
 }
 
-export const ProjectFF: React.FC<CategoryOptionComboFFProps> = ({ input, imageField }) => {
+type Loader<Data> =
+    | { type: "idle" }
+    | { type: "loading" }
+    | { type: "loaded"; data: Data }
+    | { type: "error"; error: string };
+
+const noProjects: Project[] = [];
+const noImages: Image[] = [];
+
+export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
+    const { input: projectInput, imageField } = props;
     const { compositionRoot } = useAppContext();
+    const snackbar = useSnackbar();
     const { input: imageInput } = useField(imageField);
-    const [projects, setProjects] = useState<{ value: string; label: string }[]>([]);
-    const [artifactOptions, setArtifactOptions] = useState<{ value: string; label: string }[]>([]);
-
-    useEffect(() => {
-        compositionRoot.container.getProjects.execute().run(
-            data =>
-                setProjects(
-                    data
-                        .map(item => item.name)
-                        .map((name: string) => ({
-                            value: name,
-                            label: name,
-                        }))
-                ),
-            error => console.error(error)
-        );
-    }, [compositionRoot]);
-
-    useEffect(() => {
-        if (input.value) {
-            compositionRoot.container.getImages.execute(input.value).run(
-                images => {
-                    const options = images.map(tag => ({ value: tag.name, label: tag.name }));
-                    setArtifactOptions(options);
-                },
-                error => console.error(error)
-            );
-        }
-    }, [compositionRoot, input.value]);
-
     const imageInputOnChange = imageInput.onChange;
+
+    const [projectsLoader, setProjectsLoader] = useState<Loader<Project[]>>({ type: "idle" });
+    const [imagesLoader, setImagesLoader] = useState<Loader<Image[]>>({ type: "idle" });
+    const projects = projectsLoader.type === "loaded" ? projectsLoader.data : noProjects;
+    const images = imagesLoader.type === "loaded" ? imagesLoader.data : noImages;
+
     useEffect(() => {
-        imageInputOnChange(artifactOptions && artifactOptions[0] ? artifactOptions[0].value : undefined);
-    }, [artifactOptions, imageInputOnChange]);
+        return initFuture(() => setProjectsLoader({ type: "loading" }))
+            .flatMap(() => compositionRoot.container.getProjects.execute())
+            .run(
+                projects => {
+                    setProjectsLoader({ type: "loaded", data: projects });
+                },
+                error => {
+                    console.error(error);
+                    snackbar.error(error);
+                    setProjectsLoader({ type: "error", error });
+                }
+            );
+    }, [compositionRoot, snackbar]);
+
+    useEffect(() => {
+        if (projectInput.value) {
+            return initFuture(() => setImagesLoader({ type: "loading" }))
+                .flatMap(() => compositionRoot.container.getImages.execute(projectInput.value))
+                .run(
+                    images => {
+                        setImagesLoader({ type: "loaded", data: images });
+                    },
+                    error => {
+                        console.error(error);
+                        snackbar.error(error);
+                        setImagesLoader({ type: "error", error });
+                    }
+                );
+        }
+    }, [compositionRoot, projectInput.value, snackbar]);
+
+    const projectOptions = projects.map(project => ({
+        value: project.name,
+        label: project.name,
+    }));
+
+    const imageOptions = images.map(image => ({
+        value: image.id,
+        label: `${image.name} (${image.dhis2Version})`,
+    }));
+
+    useEffect(() => {
+        imageInputOnChange(images[0]?.id);
+    }, [images, imageInputOnChange]);
 
     const onChange = useCallback<NonNullable<SingleSelectFieldProps["onChange"]>>(
         ({ selected }, ev) => {
-            const project = projects.find(item => item.value === selected);
-            if (project && input.onChange) {
-                input.onChange(project.value, ev);
+            const project = projects.find(project => project.name === selected);
+
+            if (project && projectInput.onChange) {
+                projectInput.onChange(project.name, ev);
                 imageInput.onChange(undefined);
             }
         },
-        [projects, input, imageInput]
+        [projects, projectInput, imageInput]
     );
 
     const onChangeOptionCombo = useCallback(
         ({ selected }) => {
-            const optionCombo = artifactOptions.find(item => item.value === selected);
+            const selectedImage = images.find(image => image.id === selected);
 
-            if (optionCombo) {
-                imageInput.onChange(optionCombo.value);
+            if (selectedImage) {
+                imageInput.onChange(selectedImage);
             }
         },
-        [imageInput, artifactOptions]
+        [imageInput, images]
     );
+
+    const isProjectsLoading = projectsLoader.type === "loading";
+    const isArtifactsLoading = imagesLoader.type === "loading";
+    const someProjectSelected = _(projects).some(project => project.name === projectInput.value);
 
     return (
         <React.Fragment>
-            <SingleSelectField onChange={onChange} selected={input.value}>
-                {projects.map(({ value, label }) => (
+            <SingleSelectField onChange={onChange} selected={projectInput.value} loading={isProjectsLoading}>
+                {projectOptions.map(({ value, label }) => (
                     <SingleSelectOption value={value} label={label} key={value} />
                 ))}
             </SingleSelectField>
 
-            {_(projects).some(({ value }) => value === input.value) && (
+            {someProjectSelected && (
                 <React.Fragment>
                     <Row>{getNewContainerFieldName("image")}</Row>
 
-                    <SingleSelectField onChange={onChangeOptionCombo} selected={imageInput.value}>
-                        {artifactOptions.map(({ value, label }) => (
+                    <SingleSelectField
+                        onChange={onChangeOptionCombo}
+                        selected={imageInput.value.id}
+                        loading={isArtifactsLoading}
+                    >
+                        {imageOptions.map(({ value, label }) => (
                             <SingleSelectOption value={value} label={label} key={value} />
                         ))}
                     </SingleSelectField>
