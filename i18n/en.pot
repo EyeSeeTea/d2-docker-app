@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-07-07T08:35:40.367Z\n"
-"PO-Revision-Date: 2022-07-07T08:35:40.367Z\n"
+"POT-Creation-Date: 2022-07-07T10:46:51.450Z\n"
+"PO-Revision-Date: 2022-07-07T10:46:51.450Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -32,6 +32,15 @@ msgstr ""
 msgid "List"
 msgstr ""
 
+msgid "Yes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
 msgid "Image started successfully"
 msgstr ""
 
@@ -44,15 +53,6 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-msgid "Cancel"
-msgstr ""
-
-msgid "Stopping container(s)"
-msgstr ""
-
-msgid "Image(s) stopped successfully"
-msgstr ""
-
 msgid "Goto DHIS2 instance"
 msgstr ""
 
@@ -62,7 +62,28 @@ msgstr ""
 msgid "Stop container"
 msgstr ""
 
+msgid "Commit container"
+msgstr ""
+
 msgid "Details"
+msgstr ""
+
+msgid "Container stopped"
+msgstr ""
+
+msgid "Container commited"
+msgstr ""
+
+msgid "Push images"
+msgstr ""
+
+msgid "Image pushed"
+msgstr ""
+
+msgid "Pull images"
+msgstr ""
+
+msgid "Image pulled"
 msgstr ""
 
 msgid "Search by name"
@@ -95,7 +116,7 @@ msgstr ""
 msgid "Database Port"
 msgstr ""
 
-msgid "Deploy Path Namespace (i.e: `dhis2` serves `http://localhost:8080/dhis2`)"
+msgid "Deploy Path Namespace (i.e: `my-dhis2` serves `http://HOST:PORT/my-dhis2`)"
 msgstr ""
 
 msgid "Java OPT (Gigabytes of RAM)"

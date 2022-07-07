@@ -7,6 +7,7 @@ import Share from "../../components/share/Share";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
 import "./App.css";
+import { getConfig } from "../../config";
 
 export interface AppProps {}
 
@@ -17,7 +18,8 @@ export const App: React.FC<AppProps> = React.memo(function App() {
 
     useEffect(() => {
         async function setup() {
-            const compositionRoot = getCompositionRoot();
+            const config = getConfig();
+            const compositionRoot = getCompositionRoot(config);
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
             setAppContext({ compositionRoot });

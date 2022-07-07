@@ -5,44 +5,33 @@ import { Container, getLocalImageFromContainer, ContainerDefinitionValid } from 
 import { buildImage, Image } from "../../domain/entities/Image";
 import { fetchGet, fetchPost } from "../utils/future-fetch";
 import { InstancesGetResponse, D2DockerStartRequest, D2DockerStopRequest, ApiContainer } from "./D2DockerApi.types";
-
-function getImageFromRawName(name: string): Image | undefined {
-    const parts = name.split("/");
-
-    switch (parts.length) {
-        case 3: {
-            const [registryUrl = "", projectName = "", name = ""] = parts;
-            const name2 = name.split(":")[1];
-            if (!name2) return;
-            const sp = name2.split("-");
-            const version = sp[0];
-            const name3 = sp.slice(1).join("-");
-            return version && name3
-                ? buildImage({ registryUrl, project: projectName, dhis2Version: version, name: name3 })
-                : undefined;
-        }
-        default:
-            return undefined;
-    }
-}
+import { Config } from "../../domain/entities/Config";
+import { Maybe } from "../../types/utils";
 
 export class ContainersD2DockerApiRepository implements ContainersRepository {
+    d2DockerApiUrl: string;
+    dhis2Host: string;
+
+    constructor(config: Config) {
+        this.d2DockerApiUrl = config.d2DockerApiUrl;
+        this.dhis2Host = config.dhis2Host;
+    }
+
     public getAll(): FutureData<Container[]> {
         return fetchGet<InstancesGetResponse>(this.getD2DockerApiUrl("/instances")).map(({ containers }) =>
             _(containers)
-                .map((apiContainer): Container | undefined => {
+                .map((apiContainer): Maybe<Container> => {
                     const image = getImageFromRawName(apiContainer.name);
+                    if (!image) return undefined;
 
-                    return image
-                        ? {
-                              id: apiContainer.name,
-                              name: apiContainer.name,
-                              harborUrl: this.getHarborPublicDataImageUrl(image),
-                              dhis2Url: this.getDhis2PublicUrl(apiContainer),
-                              image,
-                              status: apiContainer.status,
-                          }
-                        : undefined;
+                    return {
+                        id: apiContainer.name,
+                        name: apiContainer.name,
+                        harborUrl: this.getHarborPublicDataImageUrl(image),
+                        dhis2Url: this.getDhis2PublicUrlFromContainer(apiContainer),
+                        image,
+                        status: apiContainer.status,
+                    };
                 })
                 .compact()
                 .value()
@@ -58,14 +47,14 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
         });
     }
 
-    public startInitial(container: ContainerDefinitionValid): FutureData<void> {
+    public startInitial(definition: ContainerDefinitionValid): FutureData<{ url: string }> {
         return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
             data: {
-                image: this.getDockerDataImage(getLocalImageFromContainer(container)),
+                image: this.getDockerDataImage(getLocalImageFromContainer(definition)),
                 detach: true,
-                port: parseInt(container.port),
+                port: parseInt(definition.port),
             },
-        });
+        }).map(() => ({ url: this.getDhis2PublicUrl(definition.port) }));
     }
 
     public stop(image: Image): FutureData<void> {
@@ -94,15 +83,40 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
 
     private getD2DockerApiUrl(path: string): string {
         const path2 = path.replace(/^\//, "");
-        return `http://localhost:5000/${path2}`;
+        return this.d2DockerApiUrl + "/" + path2;
     }
 
     private getHarborPublicDataImageUrl(image: Image): string | undefined {
         const parts = [image.registryUrl, "harbor/projects", image.project, "repositories/dhis2-data"];
-        return `https://${parts.join("/")}`;
+        return `${image.registryUrl}/${parts.join("/")}`;
     }
 
-    private getDhis2PublicUrl(apiContainer: ApiContainer): string | undefined {
-        return apiContainer.status === "RUNNING" ? `http://localhost:${apiContainer.port}` : undefined;
+    private getDhis2PublicUrlFromContainer(apiContainer: ApiContainer): string | undefined {
+        return apiContainer.status === "RUNNING" ? this.getDhis2PublicUrl(apiContainer.port) : undefined;
+    }
+
+    private getDhis2PublicUrl(port: string | number): string {
+        return `http://${this.dhis2Host}:${port}`;
+    }
+}
+
+function getImageFromRawName(name: string): Image | undefined {
+    // Example: docker.eyeseetea.com/samaritans/dhis2-data:2.36.9-sp-cpr
+    const parts = name.split("/");
+
+    switch (parts.length) {
+        case 3: {
+            const [registryUrl = "", projectName = "", name = ""] = parts;
+            const name2 = name.split(":")[1];
+            if (!name2) return;
+            const sp = name2.split("-");
+            const version = sp[0];
+            const name3 = sp.slice(1).join("-");
+            return version && name3
+                ? buildImage({ registryUrl, project: projectName, dhis2Version: version, name: name3 })
+                : undefined;
+        }
+        default:
+            return undefined;
     }
 }

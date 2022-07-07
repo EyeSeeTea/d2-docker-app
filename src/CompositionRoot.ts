@@ -7,10 +7,11 @@ import { CreateContainerImageUseCase } from "./domain/usecases/CreateContainerIm
 import { ImagesD2DockerApiRepository } from "./data/repositories/ImagesD2DockerApiRepository";
 import { CommitContainersUseCase } from "./domain/usecases/CommitContainersUseCase";
 import { ImagesUseCases } from "./domain/usecases/ImagesUseCases";
+import { Config } from "./domain/entities/Config";
 
-export function getCompositionRoot() {
-    const containersRepository = new ContainersD2DockerApiRepository();
-    const imagesRepository = new ImagesD2DockerApiRepository();
+export function getCompositionRoot(config: Config) {
+    const containersRepository = new ContainersD2DockerApiRepository(config);
+    const imagesRepository = new ImagesD2DockerApiRepository(config);
 
     return {
         container: {

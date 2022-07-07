@@ -6,7 +6,7 @@ import {
     getLocalImageFromContainer,
     ContainerDefinitionValid,
 } from "../../domain/entities/Container";
-import { buildImage, defaultRegistryUrl, Image } from "../../domain/entities/Image";
+import { buildImage, Image } from "../../domain/entities/Image";
 import { Project } from "../../domain/entities/Project";
 import { fetchGet, fetchPost } from "../utils/future-fetch";
 import {
@@ -17,10 +17,17 @@ import {
     D2DockerCopyRequest,
 } from "./D2DockerApi.types";
 import { ImagesRepository } from "../../domain/repositories/ImagesRepository";
-
-const registryUrl = defaultRegistryUrl;
+import { Config } from "../../domain/entities/Config";
 
 export class ImagesD2DockerApiRepository implements ImagesRepository {
+    registryHost: string;
+    d2DockerApiUrl: string;
+
+    constructor(config: Config) {
+        this.registryHost = config.registryHost;
+        this.d2DockerApiUrl = config.d2DockerApiUrl;
+    }
+
     public getProjects(): FutureData<Project[]> {
         return fetchGet<HarborProject[]>(this.getHarborApiUrl("projects"));
     }
@@ -33,7 +40,7 @@ export class ImagesD2DockerApiRepository implements ImagesRepository {
                     .compact()
                     .map(tag => getImageInfoFromName(tag.name))
                     .compact()
-                    .map(attrs => buildImage({ registryUrl, project, ...attrs }))
+                    .map(attrs => buildImage({ registryUrl: this.registryHost, project, ...attrs }))
                     .value()
         );
     }
@@ -76,11 +83,11 @@ export class ImagesD2DockerApiRepository implements ImagesRepository {
 
     private getD2DockerApiUrl(path: string): string {
         const path2 = path.replace(/^\//, "");
-        return `http://localhost:5000/${path2}`;
+        return this.d2DockerApiUrl + "/" + path2;
     }
 
     private getHarborApiUrl(path: string): string {
         const path2 = path.replace(/^\//, "");
-        return `${this.getD2DockerApiUrl("/harbor")}/https://${registryUrl}/api/v2.0/${path2}`;
+        return `${this.getD2DockerApiUrl("/harbor")}/https://${this.registryHost}/api/v2.0/${path2}`;
     }
 }

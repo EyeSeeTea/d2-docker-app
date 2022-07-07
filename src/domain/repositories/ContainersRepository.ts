@@ -5,7 +5,7 @@ import { Image } from "../entities/Image";
 export interface ContainersRepository {
     getAll(): FutureData<Container[]>;
     start(image: Image): FutureData<void>;
-    startInitial(container: ContainerDefinition): FutureData<void>;
+    startInitial(container: ContainerDefinition): FutureData<{ url: string }>;
     stop(image: Image): FutureData<void>;
     commit(container: Container): FutureData<void>;
 }

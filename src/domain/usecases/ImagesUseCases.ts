@@ -15,10 +15,15 @@ export class ImagesUseCases {
     }
 
     public push(images: Image[]): FutureData<void> {
-        return Future.parallel(images.map(image => this.imagesRepository.push(image))).map(() => undefined);
+        return this.run(images, image => this.imagesRepository.push(image));
     }
 
     public pull(images: Image[]): FutureData<void> {
-        return Future.parallel(images.map(image => this.imagesRepository.pull(image))).map(() => undefined);
+        return this.run(images, image => this.imagesRepository.pull(image));
+    }
+
+    private run(images: Image[], action: (image: Image) => FutureData<unknown>): FutureData<void> {
+        const actions$ = images.map(image => action(image));
+        return Future.parallel(actions$).map(() => undefined);
     }
 }

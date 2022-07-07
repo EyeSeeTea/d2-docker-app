@@ -85,7 +85,7 @@ export const getContainerFormFieldName = (field: ContainerFormField) => {
         case "dbPort":
             return i18n.t("Database Port");
         case "deployPath":
-            return i18n.t("Deploy Path Namespace (i.e: `dhis2` serves `http://localhost:8080/dhis2`)", {
+            return i18n.t("Deploy Path Namespace (i.e: `my-dhis2` serves `http://HOST:PORT/my-dhis2`)", {
                 nsSeparator: false,
             });
         case "javaOpt":

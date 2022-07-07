@@ -2,7 +2,6 @@ import i18n from "../../utils/i18n";
 import {
     getRemoteImageFromContainer,
     getLocalImageFromContainer,
-    ContainerDefinition,
     ContainerDefinitionValid,
 } from "../entities/Container";
 import { emptyFuture, Future, FutureData } from "../entities/Future";
@@ -40,11 +39,10 @@ export class CreateContainerImageUseCase {
             .flatMap(() => run(pushImage$, i18n.t("Push image"), localImage, 3))
             .flatMap(() => run(stopImage$, i18n.t("Stop image"), localImage, 4))
             .flatMap(() => run(startImage$, i18n.t("Start image"), localImage, 5))
-            .flatMap(() => this.openInBrowser(container));
+            .flatMap(({ url }) => this.openInBrowser(url));
     }
 
-    private openInBrowser(container: ContainerDefinition): FutureData<void> {
-        const url = `http://localhost:${container.port}`;
+    private openInBrowser(url: string): FutureData<void> {
         window.open(url, "_blank");
         return Future.success(undefined);
     }
