@@ -12,24 +12,23 @@ import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
 import i18n from "../../../utils/i18n";
 import { useBooleanState } from "../../hooks/useBoolean";
 import styled from "styled-components";
-import { initialContainer, NewContainer, NewContainerValid } from "../../../domain/entities/Container";
+import { NewContainer, NewContainerValid } from "../../../domain/entities/Container";
 import { useLoading } from "@eyeseetea/d2-ui-components";
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { useAppContext } from "../../contexts/app-context";
 
 export interface ContainerFormProps {
-    isOpen: boolean;
     close(): void;
     container?: NewContainer;
 }
 
 export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
-    const { isOpen: isContainerFormOpen, close: closeContainerForm } = props;
-    const [showAdvancedProperties, { toggle: toggleAdvancedProperties }] = useBooleanState(false);
-    const container = props.container || initialContainer;
+    const { close: closeContainerForm, container } = props;
+
+    const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
-    const { compositionRoot } = useAppContext();
+    const [showAdvancedProperties, { toggle: toggleAdvancedProperties }] = useBooleanState(false);
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
         async formValues => {
@@ -43,7 +42,7 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
             return compositionRoot.container.createImageAndStart.execute(container, { onProgress }).run(
                 () => {
                     loading.hide();
-                    snackbar.success(i18n.t("Image created successfully"));
+                    snackbar.success(i18n.t("Image started successfully"));
                     closeContainerForm();
                 },
                 error => {
@@ -55,13 +54,10 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
         [snackbar, loading, compositionRoot, closeContainerForm]
     );
 
+    if (!container) return null;
+
     return (
-        <ConfirmationDialog
-            isOpen={isContainerFormOpen}
-            title={i18n.t("Create new container")}
-            maxWidth="lg"
-            fullWidth={true}
-        >
+        <ConfirmationDialog isOpen={true} title={i18n.t("Create new container")} maxWidth="lg" fullWidth>
             <DialogContent>
                 <Form
                     onSubmit={onSubmit}

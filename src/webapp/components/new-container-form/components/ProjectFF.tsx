@@ -28,7 +28,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     const { input: projectInput, imageField } = props;
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
-    const { input: imageInput } = useField(imageField);
+    const { input: imageInput } = useField<Image>(imageField);
     const imageInputOnChange = imageInput.onChange;
 
     const [projectsLoader, setProjectsLoader] = useState<Loader<Project[]>>({ type: "idle" });
@@ -79,7 +79,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     }));
 
     useEffect(() => {
-        imageInputOnChange(images[0]?.id);
+        imageInputOnChange(images[0]);
     }, [images, imageInputOnChange]);
 
     const onChange = useCallback<NonNullable<SingleSelectFieldProps["onChange"]>>(
@@ -109,9 +109,12 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     const isArtifactsLoading = imagesLoader.type === "loading";
     const someProjectSelected = _(projects).some(project => project.name === projectInput.value);
 
+    const isValidProject = _(projectOptions).some(option => option.value === projectInput.value);
+    const projectSelected = isValidProject ? projectInput.value : undefined;
+
     return (
         <React.Fragment>
-            <SingleSelectField onChange={onChange} selected={projectInput.value} loading={isProjectsLoading}>
+            <SingleSelectField onChange={onChange} selected={projectSelected} loading={isProjectsLoading}>
                 {projectOptions.map(({ value, label }) => (
                     <SingleSelectOption value={value} label={label} key={value} />
                 ))}

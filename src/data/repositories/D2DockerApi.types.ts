@@ -82,7 +82,7 @@ export interface ImageArtifact {
     references: string[] | null;
     repository_id: number;
     size: number;
-    tags: Tag[];
+    tags: Tag[] | null;
     type: "IMAGE";
 }
 

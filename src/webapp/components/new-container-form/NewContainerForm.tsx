@@ -109,19 +109,13 @@ export const getNewContainerFieldName = (field: NewContainerFormField) => {
 
 function useValidations(field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } {
     switch (field) {
-        case "port":
-            return {
-                validation: composeValidators(hasValue, validatePort()),
-            };
-        case "dbPort":
-            return {
-                validation: composeValidators(validatePort()),
-            };
         case "projectName":
         case "image":
-            return {
-                validation: composeValidators(hasValue),
-            };
+            return { validation: composeValidators(hasValue) };
+        case "port":
+            return { validation: composeValidators(hasValue, validatePort()) };
+        case "dbPort":
+            return { validation: composeValidators(validatePort()) };
         default: {
             return { validation: requiredFields.includes(field) ? hasValue : undefined };
         }

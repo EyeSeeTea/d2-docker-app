@@ -77,10 +77,10 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
             artifacts =>
                 _(artifacts)
                     .flatMap(artifact => (artifact.type === "IMAGE" ? artifact.tags : []))
+                    .compact()
                     .map(tag => getImageInfoFromName(tag.name))
                     .compact()
                     .map(attrs => buildImage({ registryUrl, project, ...attrs }))
-                    .compact()
                     .value()
         );
     }

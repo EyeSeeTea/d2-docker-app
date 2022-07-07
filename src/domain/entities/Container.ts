@@ -51,3 +51,15 @@ export const initialContainer: NewContainer = {
     port: "8080",
     name: "",
 };
+
+export function getNewContainerFromContainer(container: Container): NewContainer {
+    const { image } = container;
+
+    return {
+        ...initialContainer,
+        projectName: image.project,
+        image: image,
+        port: "8080",
+        name: image.name,
+    };
+}
