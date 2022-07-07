@@ -2,24 +2,19 @@ import React from "react";
 import { Button } from "@dhis2/ui";
 import { Form, FormProps } from "react-final-form";
 import { DialogContent } from "@material-ui/core";
-import {
-    fields,
-    advancedFields,
-    getNewContainerFieldName,
-    ContainerField,
-} from "../../components/new-container-form/NewContainerForm";
+import { fields, advancedFields, getContainerFieldName, ContainerField } from "../new-container-form/ContainerForm";
 import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
 import i18n from "../../../utils/i18n";
 import { useBooleanState } from "../../hooks/useBoolean";
 import styled from "styled-components";
-import { NewContainer, NewContainerValid } from "../../../domain/entities/Container";
+import { ContainerDefinition, ContainerDefinitionValid } from "../../../domain/entities/Container";
 import { useLoading } from "@eyeseetea/d2-ui-components";
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { useAppContext } from "../../contexts/app-context";
 
 export interface ContainerFormProps {
     close(): void;
-    container?: NewContainer;
+    container?: ContainerDefinition;
 }
 
 export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
@@ -32,7 +27,7 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
         async formValues => {
-            const container = formValues.container as NewContainerValid;
+            const container = formValues.container as ContainerDefinitionValid;
 
             const onProgress = (msg: string, progressPercent: number) => {
                 loading.show(true, msg);
@@ -106,12 +101,12 @@ const ButtonsRow = styled.div`
     margin-right: 9px;
 `;
 
-const Field: React.FC<{ field: keyof NewContainer; container: NewContainer }> = props => {
+const Field: React.FC<{ field: keyof ContainerDefinition; container: ContainerDefinition }> = props => {
     const { field, container } = props;
 
     return (
         <Row key={`container-row-${field}`}>
-            <Label>{getNewContainerFieldName(field)}</Label>
+            <Label>{getContainerFieldName(field)}</Label>
             <ContainerField field={field} container={container} />
         </Row>
     );

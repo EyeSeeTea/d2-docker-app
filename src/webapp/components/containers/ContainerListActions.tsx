@@ -7,7 +7,11 @@ import StopIcon from "@material-ui/icons/Stop";
 
 import _ from "lodash";
 import React, { useCallback } from "react";
-import { Container, getNewContainerFromContainer, NewContainer } from "../../../domain/entities/Container";
+import {
+    Container,
+    getContainerDefinitionFromContainer,
+    ContainerDefinition,
+} from "../../../domain/entities/Container";
 import { FutureData } from "../../../domain/entities/Future";
 import { Id } from "../../../domain/entities/Ref";
 import { useAppContext } from "../../contexts/app-context";
@@ -18,7 +22,7 @@ interface UseActionsOptions {
     setIsLoading(state: boolean): void;
     refresher: Refresher;
     rows: Container[];
-    setContainerForm(container: NewContainer): void;
+    setContainerForm(container: ContainerDefinition): void;
 }
 
 export function useContainerActions(options: UseActionsOptions): {
@@ -72,7 +76,7 @@ export function useContainerActions(options: UseActionsOptions): {
 
     const startContainer = useCallback(
         (ids: Id[]) => {
-            onFirstContainer(ids, container => setContainerForm(getNewContainerFromContainer(container)));
+            onFirstContainer(ids, container => setContainerForm(getContainerDefinitionFromContainer(container)));
         },
         [onFirstContainer, setContainerForm]
     );

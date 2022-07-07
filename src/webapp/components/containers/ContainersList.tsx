@@ -7,7 +7,7 @@ import {
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 import React, { useMemo, useState } from "react";
-import { Container, initialContainer, NewContainer } from "../../../domain/entities/Container";
+import { Container, initialContainer, ContainerDefinition } from "../../../domain/entities/Container";
 import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { Refresher, useRefresher } from "../../hooks/useRefresher";
@@ -19,7 +19,7 @@ export const ContainersList: React.FC = React.memo(() => {
     const [_selection, _setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const [containerForm, setContainerForm] = React.useState<NewContainer>();
+    const [containerForm, setContainerForm] = React.useState<ContainerDefinition>();
 
     const refresher = useRefresher();
     const columns = useMemo(getColumns, []);

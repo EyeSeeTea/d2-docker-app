@@ -2,8 +2,8 @@ import i18n from "../../utils/i18n";
 import {
     getRemoteImageFromContainer,
     getLocalImageFromContainer,
-    NewContainer,
-    NewContainerValid,
+    ContainerDefinition,
+    ContainerDefinitionValid,
 } from "../entities/Container";
 import { emptyFuture, Future, FutureData } from "../entities/Future";
 import { Image } from "../entities/Image";
@@ -12,7 +12,7 @@ import { ContainerRepository } from "../repositories/ContainerRepository";
 export class CreateContainerImageUseCase {
     constructor(private containerRepository: ContainerRepository) {}
 
-    public execute(container: NewContainerValid, options: Options): FutureData<void> {
+    public execute(container: ContainerDefinitionValid, options: Options): FutureData<void> {
         const { containerRepository } = this;
         const remoteImage = getRemoteImageFromContainer(container);
         const localImage = getLocalImageFromContainer(container);
@@ -42,7 +42,7 @@ export class CreateContainerImageUseCase {
             .flatMap(() => this.openInBrowser(container));
     }
 
-    private openInBrowser(container: NewContainer): FutureData<void> {
+    private openInBrowser(container: ContainerDefinition): FutureData<void> {
         const url = `http://localhost:${container.port}`;
         window.open(url, "_blank");
         return Future.success(undefined);

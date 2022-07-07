@@ -6,7 +6,7 @@ import {
     getRemoteImageFromContainer,
     getImageInfoFromName,
     getLocalImageFromContainer,
-    NewContainerValid,
+    ContainerDefinitionValid,
 } from "../../domain/entities/Container";
 import { buildImage, defaultRegistryUrl, Image } from "../../domain/entities/Image";
 import { Project } from "../../domain/entities/Project";
@@ -101,7 +101,7 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
         });
     }
 
-    public createImage(container: NewContainerValid): FutureData<void> {
+    public createImage(container: ContainerDefinitionValid): FutureData<void> {
         const sourceImage = getRemoteImageFromContainer(container);
         const destImage = getLocalImageFromContainer(container);
 
@@ -122,7 +122,7 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
         });
     }
 
-    public startInitial(container: NewContainerValid): FutureData<void> {
+    public startInitial(container: ContainerDefinitionValid): FutureData<void> {
         return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
             data: {
                 image: this.getDockerDataImage(getLocalImageFromContainer(container)),

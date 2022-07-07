@@ -1,15 +1,15 @@
 import { composeValidators, hasValue, InputFieldFF } from "@dhis2/ui";
 import _ from "lodash";
 import React from "react";
-import { NewContainer } from "../../../domain/entities/Container";
+import { ContainerDefinition } from "../../../domain/entities/Container";
 import { FormField } from "../form/FormField";
 import { ProjectFF } from "./components/ProjectFF";
 import { Dropzone } from "../dropzone/Dropzone";
 import i18n from "../../../utils/i18n";
 
 interface ContainerFieldProps {
-    field: NewContainerFormField;
-    container: NewContainer;
+    field: ContainerFormField;
+    container: ContainerDefinition;
 }
 
 export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container }) => {
@@ -17,7 +17,7 @@ export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container
     const { validation, props: validationProps = {} } = useValidations(field);
     const props = {
         name,
-        placeholder: getNewContainerFieldName(field),
+        placeholder: getContainerFieldName(field),
         validate: validation,
         initialValue: container[field]?.toString(),
         ...validationProps,
@@ -53,11 +53,11 @@ export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container
     }
 };
 
-export type NewContainerFormField = keyof NewContainer;
+export type ContainerFormField = keyof ContainerDefinition;
 
-export const fields: NewContainerFormField[] = ["projectName", "name", "port"];
+export const fields: ContainerFormField[] = ["projectName", "name", "port"];
 
-export const advancedFields: NewContainerFormField[] = [
+export const advancedFields: ContainerFormField[] = [
     "url",
     "dbPort",
     "deployPath",
@@ -68,9 +68,9 @@ export const advancedFields: NewContainerFormField[] = [
     "runScript",
 ];
 
-export const requiredFields: NewContainerFormField[] = ["projectName", "image", "name", "port"];
+export const requiredFields: ContainerFormField[] = ["projectName", "image", "name", "port"];
 
-export const getNewContainerName = (field: NewContainerFormField) => {
+export const getContainerFormFieldName = (field: ContainerFormField) => {
     switch (field) {
         case "name":
             return i18n.t("Name");
@@ -101,13 +101,13 @@ export const getNewContainerName = (field: NewContainerFormField) => {
     }
 };
 
-export const getNewContainerFieldName = (field: NewContainerFormField) => {
-    const name = getNewContainerName(field);
+export const getContainerFieldName = (field: ContainerFormField) => {
+    const name = getContainerFormFieldName(field);
     const required = requiredFields.includes(field) ? "(*)" : undefined;
     return _.compact([name, required]).join(" ");
 };
 
-function useValidations(field: NewContainerFormField): { validation?: (...args: any[]) => any; props?: object } {
+function useValidations(field: ContainerFormField): { validation?: (...args: any[]) => any; props?: object } {
     switch (field) {
         case "projectName":
         case "image":

@@ -8,7 +8,7 @@ import { initFuture } from "../../../../domain/entities/Future";
 import { Image } from "../../../../domain/entities/Image";
 import { Project } from "../../../../domain/entities/Project";
 import { useAppContext } from "../../../contexts/app-context";
-import { getNewContainerFieldName } from "../NewContainerForm";
+import { getContainerFieldName } from "../ContainerForm";
 
 export interface CategoryOptionComboFFProps {
     input: FinalFormInput;
@@ -122,7 +122,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
 
             {someProjectSelected && (
                 <React.Fragment>
-                    <Row>{getNewContainerFieldName("image")}</Row>
+                    <Row>{getContainerFieldName("image")}</Row>
 
                     <SingleSelectField
                         onChange={onChangeOptionCombo}
