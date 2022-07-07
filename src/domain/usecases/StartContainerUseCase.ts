@@ -6,7 +6,7 @@ export class StartContainerUseCase {
     constructor(private containerRepository: ContainersRepository) {}
 
     public execute(images: Image[]): FutureData<void> {
-        const starts$ = images.map(images => this.containerRepository.start(images));
+        const starts$ = images.map(image => this.containerRepository.start(image));
         return Future.parallel(starts$).map(() => undefined);
     }
 }

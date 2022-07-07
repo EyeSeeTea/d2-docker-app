@@ -1,6 +1,6 @@
 import { TableAction, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import i18n from "@eyeseetea/d2-ui-components/locales";
-import { LocalHospital } from "@material-ui/icons";
+import { LocalHospital, SaveAlt } from "@material-ui/icons";
 import DetailsIcon from "@material-ui/icons/Details";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
@@ -15,6 +15,7 @@ import {
 import { FutureData } from "../../../domain/entities/Future";
 import { Id } from "../../../domain/entities/Ref";
 import { useAppContext } from "../../contexts/app-context";
+import { useCallbackEffect } from "../../hooks/useCallbackEffect";
 import { Refresher } from "../../hooks/useRefresher";
 import { goTo } from "../../utils/links";
 
@@ -38,7 +39,8 @@ export function useContainerActions(options: UseActionsOptions): {
         (options: { actionMsg: string; successMsg: string; action: () => FutureData<void> }) => {
             const { actionMsg, successMsg, action } = options;
             loading.show(true, actionMsg);
-            action().run(
+
+            return action().run(
                 () => {
                     snackbar.success(successMsg);
                     refresh();
@@ -83,10 +85,23 @@ export function useContainerActions(options: UseActionsOptions): {
 
     const stopContainer = useCallback(
         (ids: Id[]) => {
-            runAction({
-                actionMsg: i18n.t("Stopping container(s)") + ": " + ids.join(", "),
-                successMsg: i18n.t("Image(s) stopped successfully"),
+            const info = ": " + ids.join(", ");
+            return runAction({
+                actionMsg: i18n.t("Stopping container") + info,
+                successMsg: i18n.t("Container stopped") + info,
                 action: () => compositionRoot.container.stop.execute(getContainers(ids).map(c => c.image)),
+            });
+        },
+        [compositionRoot, runAction, getContainers]
+    );
+
+    const commitContainers = useCallback(
+        (ids: Id[]) => {
+            const info = ": " + ids.join(", ");
+            return runAction({
+                actionMsg: i18n.t("Committing container") + info,
+                successMsg: i18n.t("Container commited") + info,
+                action: () => compositionRoot.container.commit.execute(getContainers(ids)),
             });
         },
         [compositionRoot, runAction, getContainers]
@@ -116,15 +131,23 @@ export function useContainerActions(options: UseActionsOptions): {
             multiple: true,
             icon: <PlayArrowIcon />,
             onClick: startContainer,
-            isActive: containers => _(containers).every(container => container.status === "STOPPED"),
+            isActive: forStoppedContainers,
         },
         {
             name: "stop",
             text: i18n.t("Stop container"),
             multiple: true,
             icon: <StopIcon />,
-            onClick: stopContainer,
-            isActive: containers => _(containers).every(container => container.status === "RUNNING"),
+            onClick: useCallbackEffect(stopContainer),
+            isActive: forRunningContainers,
+        },
+        {
+            name: "commit",
+            text: i18n.t("Commit container"),
+            multiple: true,
+            icon: <SaveAlt />,
+            onClick: useCallbackEffect(commitContainers),
+            isActive: forRunningContainers,
         },
         {
             name: "details",
@@ -135,4 +158,12 @@ export function useContainerActions(options: UseActionsOptions): {
     ];
 
     return { actions };
+}
+
+function forRunningContainers(containers: Container[]): boolean {
+    return _(containers).every(container => container.status === "RUNNING");
+}
+
+function forStoppedContainers(containers: Container[]): boolean {
+    return _(containers).every(container => container.status === "STOPPED");
 }

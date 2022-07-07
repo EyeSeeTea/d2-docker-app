@@ -110,3 +110,15 @@ export interface D2DockerStartRequest {
 export interface D2DockerStopRequest {
     image: string;
 }
+
+export interface D2DockerCommitRequest {
+    image: string;
+}
+
+export interface D2DockerPushRequest {
+    image: string;
+}
+
+export interface D2DockerPullRequest {
+    image: string;
+}

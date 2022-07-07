@@ -38,7 +38,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
 
     useEffect(() => {
         return initFuture(() => setProjectsLoader({ type: "loading" }))
-            .flatMap(() => compositionRoot.container.getProjects.execute())
+            .flatMap(() => compositionRoot.images.getProjects.execute())
             .run(
                 projects => {
                     setProjectsLoader({ type: "loaded", data: projects });
@@ -54,7 +54,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     useEffect(() => {
         if (projectInput.value) {
             return initFuture(() => setImagesLoader({ type: "loading" }))
-                .flatMap(() => compositionRoot.container.getImages.execute(projectInput.value))
+                .flatMap(() => compositionRoot.images.get.execute(projectInput.value))
                 .run(
                     images => {
                         setImagesLoader({ type: "loaded", data: images });
@@ -79,7 +79,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     }));
 
     useEffect(() => {
-        imageInputOnChange(images[0]);
+        imageInputOnChange(_.first(images));
     }, [images, imageInputOnChange]);
 
     const onChange = useCallback<NonNullable<SingleSelectFieldProps["onChange"]>>(

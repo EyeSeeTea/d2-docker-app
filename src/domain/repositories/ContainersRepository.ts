@@ -7,4 +7,5 @@ export interface ContainersRepository {
     start(image: Image): FutureData<void>;
     startInitial(container: ContainerDefinition): FutureData<void>;
     stop(image: Image): FutureData<void>;
+    commit(container: Container): FutureData<void>;
 }

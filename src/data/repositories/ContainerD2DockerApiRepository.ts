@@ -76,6 +76,14 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
         });
     }
 
+    public commit(container: Container): FutureData<void> {
+        return fetchPost<D2DockerStopRequest, void>(this.getD2DockerApiUrl("/instances/commit"), {
+            data: {
+                image: this.getDockerDataImage(container.image),
+            },
+        });
+    }
+
     /* Private methods */
 
     private getDockerDataImage(image: Image): string {
