@@ -1,6 +1,6 @@
 import { TableAction } from "@eyeseetea/d2-ui-components";
 import i18n from "@eyeseetea/d2-ui-components/locales";
-import { LocalHospital, SaveAlt } from "@material-ui/icons";
+import { CloudDownload, CloudUpload, LocalHospital, SaveAlt } from "@material-ui/icons";
 import DetailsIcon from "@material-ui/icons/Details";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
@@ -10,7 +10,7 @@ import React from "react";
 import { Container } from "../../../domain/entities/Container";
 import { Id } from "../../../domain/entities/Ref";
 
-type Action = "start" | "stop" | "goToDhis2" | "commit";
+type Action = "start" | "stop" | "goToDhis2" | "commit" | "push" | "pull";
 
 export interface UseContainerActionsOptions {
     rows: Container[];
@@ -64,6 +64,14 @@ export function useContainerActions(options: UseContainerActionsOptions): {
             multiple: true,
             icon: <SaveAlt />,
             isActive: forRunningContainers,
+        }),
+        action("push", i18n.t("Push image"), {
+            multiple: true,
+            icon: <CloudUpload />,
+        }),
+        action("pull", i18n.t("Pull image"), {
+            multiple: true,
+            icon: <CloudDownload />,
         }),
         {
             name: "details",

@@ -80,7 +80,7 @@ function getColumns(): TableColumn<Container>[] {
             sortable: true,
             getValue: container => {
                 const style: React.CSSProperties =
-                    container.status === "RUNNING" ? { color: "#080", fontWeight: "bold" } : {};
+                    container.status === "RUNNING" ? { color: "#080", fontWeight: "bold" } : { color: "#422" };
                 return <span style={style}> {container.status}</span>;
             },
         },

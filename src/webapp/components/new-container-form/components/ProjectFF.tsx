@@ -38,7 +38,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
 
     useEffect(() => {
         return initFuture(() => setProjectsLoader({ type: "loading" }))
-            .flatMap(() => compositionRoot.images.getProjects.execute())
+            .flatMap(() => compositionRoot.images.getProjects())
             .run(
                 projects => {
                     setProjectsLoader({ type: "loaded", data: projects });
@@ -54,7 +54,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     useEffect(() => {
         if (projectInput.value) {
             return initFuture(() => setImagesLoader({ type: "loading" }))
-                .flatMap(() => compositionRoot.images.get.execute(projectInput.value))
+                .flatMap(() => compositionRoot.images.get(projectInput.value))
                 .run(
                     images => {
                         setImagesLoader({ type: "loaded", data: images });

@@ -1,8 +1,13 @@
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import React from "react";
-import { ContainerDefinition, getContainerDefinitionFromContainer } from "../../../domain/entities/Container";
+import {
+    Container,
+    ContainerDefinition,
+    getContainerDefinitionFromContainer,
+} from "../../../domain/entities/Container";
 import { FutureData, initFuture } from "../../../domain/entities/Future";
+import { Image } from "../../../domain/entities/Image";
 import { useAppContext } from "../../contexts/app-context";
 import { Refresher } from "../../hooks/useRefresher";
 import { goTo } from "../../utils/links";
@@ -28,7 +33,6 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
     const snackbar = useSnackbar();
     const loading = useLoading();
     const [confirmation, setConfirmation] = React.useState<Confirmation>();
-
     const { refresh } = refresher;
 
     const runAction = React.useCallback(
@@ -84,16 +88,30 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                 }
                 case "stop":
                     return runAction({
-                        actionMsg: i18n.t("Stopping container") + names,
+                        actionMsg: i18n.t("Stop container") + names,
                         successMsg: i18n.t("Container stopped") + names,
-                        action: () => compositionRoot.container.stop.execute(containers.map(c => c.image)),
+                        action: () => compositionRoot.container.stop.execute(getImages(containers)),
                     });
                 case "commit":
                     return runAction({
                         askConfirmation: true,
-                        actionMsg: i18n.t("Committing container") + names,
+                        actionMsg: i18n.t("Commit container") + names,
                         successMsg: i18n.t("Container commited") + names,
                         action: () => compositionRoot.container.commit.execute(containers),
+                    });
+                case "push":
+                    return runAction({
+                        askConfirmation: true,
+                        actionMsg: i18n.t("Push images") + names,
+                        successMsg: i18n.t("Image pushed") + names,
+                        action: () => compositionRoot.images.push(getImages(containers)),
+                    });
+                case "pull":
+                    return runAction({
+                        askConfirmation: true,
+                        actionMsg: i18n.t("Pull images") + names,
+                        successMsg: i18n.t("Image pulled") + names,
+                        action: () => compositionRoot.images.pull(getImages(containers)),
                     });
                 default:
                     throw new Error(`Action not implemented: ${action}`);
@@ -103,4 +121,8 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
     );
 
     return { onAction, confirmation: { confirmation, setConfirmation } };
+}
+
+function getImages(containers: Container[]): Image[] {
+    return containers.map(c => c.image);
 }
