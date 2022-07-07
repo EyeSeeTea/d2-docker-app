@@ -21,10 +21,20 @@ export interface CveAllowlist {
     update_time: Date;
 }
 
-export interface ApiContainer {
+export type ApiContainer = ApiContainerStopped | ApiContainerRunning;
+
+export interface ApiContainerBase {
     name: string;
     description: string;
-    status: "RUNNING" | "STOPPED";
+}
+
+interface ApiContainerStopped extends ApiContainerBase {
+    status: "STOPPED";
+}
+
+interface ApiContainerRunning extends ApiContainerBase {
+    status: "RUNNING";
+    port: number;
 }
 
 export interface InstancesGetResponse {

@@ -11,7 +11,9 @@ export interface Image {
 
 export const defaultRegistryUrl = "docker.eyeseetea.com";
 
-export function buildImage(attrs: Omit<Image, "id" | "type" | "registryUrl"> & { registryUrl?: string }): Image {
+type ImageAttrs = Omit<Image, "id" | "type" | "registryUrl">;
+
+export function buildImage(attrs: ImageAttrs & { registryUrl?: string }): Image {
     return {
         type: "image",
         id: [attrs.project, attrs.dhis2Version, attrs.name].join("."),

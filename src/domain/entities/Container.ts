@@ -4,14 +4,14 @@ import { Id } from "./Ref";
 export interface Container {
     id: Id;
     name: string;
-    url?: string;
     status: ContainerStatus;
+    harborUrl?: string;
+    dhis2Url?: string;
     image: Image;
 }
 
 export type ContainerStatus = "RUNNING" | "STOPPED";
 
-// TODO: This is a ViewModel
 export interface NewContainer {
     projectName: string;
     image: Image | undefined;
@@ -37,7 +37,7 @@ export function getImageInfoFromName(name: string): Pick<Image, "dhis2Version" |
     return { dhis2Version: version, name: imageName };
 }
 
-export function getImageFromContainer(container: NewContainerValid): Image {
+export function getRemoteImageFromContainer(container: NewContainerValid): Image {
     return container.image;
 }
 

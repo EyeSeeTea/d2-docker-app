@@ -3,7 +3,7 @@ import { FutureData } from "../../domain/entities/Future";
 import { ContainerRepository } from "../../domain/repositories/ContainerRepository";
 import {
     Container,
-    getImageFromContainer,
+    getRemoteImageFromContainer,
     getImageInfoFromName,
     getLocalImageFromContainer,
     NewContainerValid,
@@ -20,6 +20,7 @@ import {
     D2DockerCopyRequest,
     D2DockerStartRequest,
     D2DockerStopRequest,
+    ApiContainer,
 } from "./D2DockerApi.types";
 
 const registryUrl = defaultRegistryUrl;
@@ -55,7 +56,8 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
                         ? {
                               id: apiContainer.name,
                               name: apiContainer.name,
-                              url: this.getHarborPublicUrl(image),
+                              harborUrl: this.getHarborPublicDataImageUrl(image),
+                              dhis2Url: this.getDhis2PublicUrl(apiContainer),
                               image,
                               status: apiContainer.status,
                           }
@@ -86,7 +88,7 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     public pullImage(image: Image): FutureData<void> {
         return fetchPost<D2DockerPullRequest, void>(this.getD2DockerApiUrl("/instances/pull"), {
             data: {
-                image: this.getDockerImage(image),
+                image: this.getDockerDataImage(image),
             },
         });
     }
@@ -94,19 +96,19 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     public pushImage(image: Image): FutureData<void> {
         return fetchPost<D2DockerPushRequest, void>(this.getD2DockerApiUrl("/instances/push"), {
             data: {
-                image: this.getDockerImage(image),
+                image: this.getDockerDataImage(image),
             },
         });
     }
 
     public createImage(container: NewContainerValid): FutureData<void> {
-        const sourceImage = getImageFromContainer(container);
+        const sourceImage = getRemoteImageFromContainer(container);
         const destImage = getLocalImageFromContainer(container);
 
         return fetchPost<D2DockerCopyRequest, void>(this.getD2DockerApiUrl("/instances/copy"), {
             data: {
-                source: this.getDockerImage(sourceImage),
-                destinations: [this.getDockerImage(destImage)],
+                source: this.getDockerDataImage(sourceImage),
+                destinations: [this.getDockerDataImage(destImage)],
             },
         });
     }
@@ -114,7 +116,7 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     public start(image: Image): FutureData<void> {
         return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
             data: {
-                image: this.getDockerImage(image),
+                image: this.getDockerDataImage(image),
                 detach: true,
             },
         });
@@ -123,7 +125,7 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     public startInitial(container: NewContainerValid): FutureData<void> {
         return fetchPost<D2DockerStartRequest, void>(this.getD2DockerApiUrl("/instances/start"), {
             data: {
-                image: this.getDockerImage(getLocalImageFromContainer(container)),
+                image: this.getDockerDataImage(getLocalImageFromContainer(container)),
                 detach: true,
                 port: parseInt(container.port),
             },
@@ -133,14 +135,14 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
     public stop(image: Image): FutureData<void> {
         return fetchPost<D2DockerStopRequest, void>(this.getD2DockerApiUrl("/instances/stop"), {
             data: {
-                image: this.getDockerImage(image),
+                image: this.getDockerDataImage(image),
             },
         });
     }
 
     /* Private methods */
 
-    private getDockerImage(image: Image): string {
+    private getDockerDataImage(image: Image): string {
         const dhis2DataImageName = `dhis2-data:${image.dhis2Version}-${image.name}`;
         const parts = [image.registryUrl, image.project, dhis2DataImageName];
         return _.compact(parts).join("/");
@@ -156,13 +158,12 @@ export class ContainerD2DockerApiRepository implements ContainerRepository {
         return `${this.getD2DockerApiUrl("/harbor")}/https://${registryUrl}/api/v2.0/${path2}`;
     }
 
-    private getHarborPublicUrl(image: Image): string | undefined {
-        if (image.registryUrl) {
-            const parts = [image.registryUrl, "harbor", "projects", image.project, "repositories", "dhis2-data"];
+    private getHarborPublicDataImageUrl(image: Image): string | undefined {
+        const parts = [image.registryUrl, "harbor/projects", image.project, "repositories/dhis2-data"];
+        return `https://${parts.join("/")}`;
+    }
 
-            return `https://${parts.join("/")}`;
-        } else {
-            return undefined;
-        }
+    private getDhis2PublicUrl(apiContainer: ApiContainer): string | undefined {
+        return apiContainer.status === "RUNNING" ? `http://localhost:${apiContainer.port}` : undefined;
     }
 }

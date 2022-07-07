@@ -5,20 +5,20 @@ type Callback = () => void;
 type UseBooleanReturn = [boolean, UseBooleanActions];
 
 interface UseBooleanActions {
-    set: (newValue: boolean) => void;
+    update: (newValue: boolean) => void;
+    set: Callback;
+    unset: Callback;
     toggle: Callback;
-    enable: Callback;
-    disable: Callback;
 }
 
 export function useBooleanState(initialValue = false): UseBooleanReturn {
     const [value, setValue] = React.useState(initialValue);
 
-    const actions = React.useMemo(() => {
+    const actions = React.useMemo<UseBooleanActions>(() => {
         return {
-            set: (newValue: boolean) => setValue(newValue),
-            enable: () => setValue(true),
-            disable: () => setValue(false),
+            update: (newValue: boolean) => setValue(newValue),
+            set: () => setValue(true),
+            unset: () => setValue(false),
             toggle: () => setValue(value_ => !value_),
         };
     }, [setValue]);

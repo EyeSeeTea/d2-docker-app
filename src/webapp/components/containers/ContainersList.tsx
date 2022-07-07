@@ -8,6 +8,7 @@ import {
     useLoading,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
+import { LocalHospital } from "@material-ui/icons";
 import DetailsIcon from "@material-ui/icons/Details";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import StopIcon from "@material-ui/icons/Stop";
@@ -20,29 +21,30 @@ import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { useBooleanState } from "../../hooks/useBoolean";
 import { Refresher, useRefresher } from "../../hooks/useRefresher";
+import { goTo } from "../../utils/links";
+import { Link } from "../links/Link";
 import { ContainerForm } from "./ContainerForm";
 
 export const ContainersList: React.FC = React.memo(() => {
     const [_selection, _setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [formIsOpen, { set: openForm, unset: closeForm }] = useBooleanState(false);
 
+    const refresher = useRefresher();
     const columns = useMemo(getColumns, []);
     const details = getDetails();
-    const refresher = useRefresher();
     const rows = useContainerLoader({ setIsLoading, refresher });
     const { actions } = useContainerActions({ setIsLoading, refresher, rows });
     const { refresh } = refresher;
 
-    const [containerFormIsOpen, { enable: openContainerForm, disable: closeContainerForm }] = useBooleanState(false);
-
     const closeFormAndReloadList = React.useCallback(() => {
-        closeContainerForm();
+        closeForm();
         refresh();
-    }, [closeContainerForm, refresh]);
+    }, [closeForm, refresh]);
 
     return (
         <div>
-            <ContainerForm isOpen={containerFormIsOpen} close={closeFormAndReloadList} />
+            <ContainerForm isOpen={formIsOpen} close={closeFormAndReloadList} />
 
             <ObjectsTable<Container>
                 rows={rows}
@@ -53,7 +55,7 @@ export const ContainersList: React.FC = React.memo(() => {
                 actions={actions}
                 details={details}
                 searchBoxLabel={i18n.t("Search by name")}
-                onActionButtonClick={openContainerForm}
+                onActionButtonClick={openForm}
             />
         </div>
     );
@@ -63,23 +65,42 @@ const initialState: TableInitialState<Container> = {
     sorting: { field: "status", order: "asc" },
 };
 
+function getColumns(): TableColumn<Container>[] {
+    return [
+        {
+            name: "name",
+            text: i18n.t("Name"),
+            sortable: true,
+            getValue: container => {
+                return <Link name={container.name} url={container.dhis2Url} tooltip={i18n.t("Open DHIS2 instance")} />;
+            },
+        },
+        {
+            name: "status",
+            text: i18n.t("Status"),
+            sortable: true,
+            getValue: container => {
+                const style: React.CSSProperties =
+                    container.status === "RUNNING" ? { color: "#080", fontWeight: "bold" } : {};
+                return <span style={style}> {container.status}</span>;
+            },
+        },
+    ];
+}
+
 function getDetails(): ObjectsTableDetailField<Container>[] {
     return [
         {
             name: "name",
             text: i18n.t("Name"),
             getValue: container => {
-                return container.url ? <a href={container.url}>{container.id}</a> : container.id;
+                return <Link name={container.id} url={container.harborUrl} />;
             },
         },
-        { name: "status", text: i18n.t("Status") },
-    ];
-}
-
-function getColumns(): TableColumn<Container>[] {
-    return [
-        { name: "name", text: i18n.t("Name"), sortable: true },
-        { name: "status", text: i18n.t("Status"), sortable: true },
+        {
+            name: "status",
+            text: i18n.t("Status"),
+        },
     ];
 }
 
@@ -148,13 +169,12 @@ function useContainerActions(options: UseActionsOptions): {
         [snackbar, setIsLoading, refresh, loading]
     );
 
-    const getImages = React.useCallback(
+    const getContainers = React.useCallback(
         (ids: Id[]) => {
             return _(rows)
                 .keyBy(container => container.id)
                 .at(ids)
                 .compact()
-                .map(container => container.image)
                 .value();
         },
         [rows]
@@ -165,10 +185,10 @@ function useContainerActions(options: UseActionsOptions): {
             runAction({
                 actionMsg: i18n.t("Starting container(s)") + ": " + ids.join(", "),
                 successMsg: i18n.t("Image(s) started successfully"),
-                action: () => compositionRoot.container.start.execute(getImages(ids)),
+                action: () => compositionRoot.container.start.execute(getContainers(ids).map(c => c.image)),
             });
         },
-        [compositionRoot, runAction, getImages]
+        [compositionRoot, runAction, getContainers]
     );
 
     const stopContainer = useCallback(
@@ -176,13 +196,29 @@ function useContainerActions(options: UseActionsOptions): {
             runAction({
                 actionMsg: i18n.t("Stopping container(s)") + ": " + ids.join(", "),
                 successMsg: i18n.t("Image(s) stopped successfully"),
-                action: () => compositionRoot.container.stop.execute(getImages(ids)),
+                action: () => compositionRoot.container.stop.execute(getContainers(ids).map(c => c.image)),
             });
         },
-        [compositionRoot, runAction, getImages]
+        [compositionRoot, runAction, getContainers]
+    );
+
+    const goToDhis2 = useCallback(
+        (ids: Id[]) => {
+            const container = _.first(getContainers(ids));
+            if (container && container.dhis2Url) goTo(container.dhis2Url);
+        },
+        [getContainers]
     );
 
     const actions: TableAction<Container>[] = [
+        {
+            name: "dhis2-instance",
+            text: i18n.t("Goto DHIS2 instance"),
+            multiple: false,
+            icon: <LocalHospital />,
+            onClick: goToDhis2,
+            isActive: containers => _(containers).every(container => container.status === "RUNNING"),
+        },
         {
             name: "start",
             text: i18n.t("Start container"),

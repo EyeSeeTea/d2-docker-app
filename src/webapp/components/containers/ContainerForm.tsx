@@ -32,8 +32,8 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
     const { compositionRoot } = useAppContext();
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
-        async values => {
-            const container = values.container as NewContainerValid;
+        async formValues => {
+            const container = formValues.container as NewContainerValid;
 
             const onProgress = (msg: string, progressPercent: number) => {
                 loading.show(true, msg);

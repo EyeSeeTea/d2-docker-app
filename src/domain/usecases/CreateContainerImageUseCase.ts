@@ -1,11 +1,11 @@
 import i18n from "../../utils/i18n";
 import {
-    getImageFromContainer,
+    getRemoteImageFromContainer,
     getLocalImageFromContainer,
     NewContainer,
     NewContainerValid,
 } from "../entities/Container";
-import { Future, FutureData } from "../entities/Future";
+import { emptyFuture, Future, FutureData } from "../entities/Future";
 import { Image } from "../entities/Image";
 import { ContainerRepository } from "../repositories/ContainerRepository";
 
@@ -14,12 +14,12 @@ export class CreateContainerImageUseCase {
 
     public execute(container: NewContainerValid, options: Options): FutureData<void> {
         const { containerRepository } = this;
-        const remoteImage = getImageFromContainer(container);
+        const remoteImage = getRemoteImageFromContainer(container);
         const localImage = getLocalImageFromContainer(container);
-        const steps = 4;
+        const steps = 5;
 
         function run<T>(action: FutureData<T>, msg: string, image: Image, step: number): FutureData<T> {
-            return Future.success<void, string>(undefined).flatMap(() => {
+            return emptyFuture().flatMap(() => {
                 const percent = (step / (steps + 1)) * 100;
                 const msgWithImage = `${msg}: ${image.name}`;
                 options.onProgress(msgWithImage, percent);
@@ -30,13 +30,15 @@ export class CreateContainerImageUseCase {
         const pullImage$ = containerRepository.pullImage(remoteImage);
         const createImage = containerRepository.createImage(container);
         const pushImage$ = containerRepository.pushImage(localImage);
+        const stopImage$ = containerRepository.stop(localImage);
         const startImage$ = containerRepository.startInitial(container);
 
-        return Future.success<void, string>(undefined)
+        return emptyFuture()
             .flatMap(() => run(pullImage$, i18n.t("Pull image"), remoteImage, 1))
             .flatMap(() => run(createImage, i18n.t("Copy image"), localImage, 2))
             .flatMap(() => run(pushImage$, i18n.t("Push image"), localImage, 3))
-            .flatMap(() => run(startImage$, i18n.t("Start image"), localImage, 4))
+            .flatMap(() => run(stopImage$, i18n.t("Stop image"), localImage, 4))
+            .flatMap(() => run(startImage$, i18n.t("Start image"), localImage, 5))
             .flatMap(() => this.openInBrowser(container));
     }
 

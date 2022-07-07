@@ -5,19 +5,31 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-07-05T11:14:47.679Z\n"
-"PO-Revision-Date: 2022-07-05T11:14:47.679Z\n"
+"POT-Creation-Date: 2022-07-07T07:42:01.312Z\n"
+"PO-Revision-Date: 2022-07-07T07:42:01.312Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
+msgstr ""
+
+msgid "Pull image"
+msgstr ""
+
+msgid "Copy image"
+msgstr ""
+
+msgid "Push image"
+msgstr ""
+
+msgid "Stop image"
+msgstr ""
+
+msgid "Start image"
 msgstr ""
 
 msgid "Add"
 msgstr ""
 
 msgid "List"
-msgstr ""
-
-msgid "Pulling image"
 msgstr ""
 
 msgid "Image created successfully"
@@ -44,10 +56,22 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+msgid "Open DHIS2 instance"
+msgstr ""
+
+msgid "Starting container(s)"
+msgstr ""
+
 msgid "Image(s) started successfully"
 msgstr ""
 
+msgid "Stopping container(s)"
+msgstr ""
+
 msgid "Image(s) stopped successfully"
+msgstr ""
+
+msgid "Goto DHIS2 instance"
 msgstr ""
 
 msgid "Start container"
