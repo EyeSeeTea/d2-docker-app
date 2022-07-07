@@ -1,9 +1,9 @@
 import { Future, FutureData } from "../entities/Future";
 import { Image } from "../entities/Image";
-import { ContainerRepository } from "../repositories/ContainerRepository";
+import { ContainersRepository } from "../repositories/ContainersRepository";
 
 export class StopContainerUseCase {
-    constructor(private containerRepository: ContainerRepository) {}
+    constructor(private containerRepository: ContainersRepository) {}
 
     public execute(images: Image[]): FutureData<void> {
         const stops$ = images.map(image => this.containerRepository.stop(image));

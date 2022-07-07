@@ -1,11 +1,11 @@
 import { FutureData } from "../entities/Future";
 import { Image } from "../entities/Image";
-import { ContainerRepository } from "../repositories/ContainerRepository";
+import { ImagesRepository } from "../repositories/ImagesRepository";
 
 export class GetImagesUseCase {
-    constructor(private containerRepository: ContainerRepository) {}
+    constructor(private imagesRepository: ImagesRepository) {}
 
     public execute(project: string): FutureData<Image[]> {
-        return this.containerRepository.getImages(project);
+        return this.imagesRepository.getForProject(project);
     }
 }

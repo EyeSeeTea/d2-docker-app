@@ -7,13 +7,14 @@ import {
 } from "../entities/Container";
 import { emptyFuture, Future, FutureData } from "../entities/Future";
 import { Image } from "../entities/Image";
-import { ContainerRepository } from "../repositories/ContainerRepository";
+import { ContainersRepository } from "../repositories/ContainersRepository";
+import { ImagesRepository } from "../repositories/ImagesRepository";
 
 export class CreateContainerImageUseCase {
-    constructor(private containerRepository: ContainerRepository) {}
+    constructor(private imagesRepository: ImagesRepository, private containersRepository: ContainersRepository) {}
 
     public execute(container: ContainerDefinitionValid, options: Options): FutureData<void> {
-        const { containerRepository } = this;
+        const { imagesRepository, containersRepository } = this;
         const remoteImage = getRemoteImageFromContainer(container);
         const localImage = getLocalImageFromContainer(container);
         const steps = 5;
@@ -27,11 +28,11 @@ export class CreateContainerImageUseCase {
             });
         }
 
-        const pullImage$ = containerRepository.pullImage(remoteImage);
-        const createImage = containerRepository.createImage(container);
-        const pushImage$ = containerRepository.pushImage(localImage);
-        const stopImage$ = containerRepository.stop(localImage);
-        const startImage$ = containerRepository.startInitial(container);
+        const pullImage$ = imagesRepository.pull(remoteImage);
+        const createImage = imagesRepository.create(container);
+        const pushImage$ = imagesRepository.push(localImage);
+        const stopImage$ = containersRepository.stop(localImage);
+        const startImage$ = containersRepository.startInitial(container);
 
         return emptyFuture()
             .flatMap(() => run(pullImage$, i18n.t("Pull image"), remoteImage, 1))

@@ -1,11 +1,11 @@
 import { FutureData } from "../entities/Future";
 import { Project } from "../entities/Project";
-import { ContainerRepository } from "../repositories/ContainerRepository";
+import { ImagesRepository } from "../repositories/ImagesRepository";
 
 export class ListProjectsUseCase {
-    constructor(private containerRepository: ContainerRepository) {}
+    constructor(private imagesRepository: ImagesRepository) {}
 
     public execute(): FutureData<Project[]> {
-        return this.containerRepository.getProjects();
+        return this.imagesRepository.getProjects();
     }
 }
