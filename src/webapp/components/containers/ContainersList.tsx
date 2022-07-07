@@ -11,9 +11,11 @@ import { Container, initialContainer, ContainerDefinition } from "../../../domai
 import i18n from "../../../utils/i18n";
 import { useAppContext } from "../../contexts/app-context";
 import { Refresher, useRefresher } from "../../hooks/useRefresher";
+import { UserConfirmation } from "../confirmation/UserConfirmation";
 import { Link } from "../links/Link";
 import { ContainerForm } from "./ContainerForm";
 import { useContainerActions } from "./ContainerListActions";
+import { useActionRunners } from "./ContainerListRunner";
 
 export const ContainersList: React.FC = React.memo(() => {
     const [_selection, _setSelection] = useState<TableSelection[]>([]);
@@ -24,8 +26,10 @@ export const ContainersList: React.FC = React.memo(() => {
     const refresher = useRefresher();
     const columns = useMemo(getColumns, []);
     const details = getDetails();
+
     const rows = useContainerLoader({ setIsLoading, refresher });
-    const { actions } = useContainerActions({ setIsLoading, refresher, rows, setContainerForm });
+    const { onAction, confirmation } = useActionRunners({ setIsLoading, refresher, setContainerForm });
+    const { actions } = useContainerActions({ rows, onAction });
     const { refresh } = refresher;
 
     const closeFormAndReloadList = React.useCallback(() => {
@@ -38,6 +42,7 @@ export const ContainersList: React.FC = React.memo(() => {
     return (
         <div>
             <ContainerForm close={closeFormAndReloadList} container={containerForm} />
+            <UserConfirmation confirmation={confirmation} />
 
             <ObjectsTable<Container>
                 rows={rows}
@@ -65,7 +70,8 @@ function getColumns(): TableColumn<Container>[] {
             text: i18n.t("Name"),
             sortable: true,
             getValue: container => {
-                return <Link name={container.name} url={container.dhis2Url} tooltip={i18n.t("Open DHIS2 instance")} />;
+                const tooltip = i18n.t("Open DHIS2 instance");
+                return <Link name={container.name} url={container.dhis2Url} tooltip={tooltip} />;
             },
         },
         {

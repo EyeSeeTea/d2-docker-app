@@ -44,6 +44,11 @@ export class Future<E, D> {
         });
     }
 
+    tap(effect: () => void): Future<E, D> {
+        effect();
+        return this;
+    }
+
     /* Static methods */
     static noCancel: Cancel = () => {};
 
