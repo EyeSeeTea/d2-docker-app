@@ -9,26 +9,32 @@ export const defaultConfig: Config = {
     hideAdvancedOptions: false,
 };
 
-function getFromEnv(envVarName: string): string | undefined {
-    return process.env[`REACT_APP_${envVarName}`];
+function getFromEnv(name: string): string {
+    const varName = `REACT_APP_${name}`;
+    const value = process.env[varName];
+
+    if (value === undefined) {
+        throw new Error(`${varName} not defined`);
+    } else {
+        return value;
+    }
 }
 
-function get(defaultValue: string, envName: string): string {
-    const valueFromEnv = getFromEnv(envName);
-    return valueFromEnv ?? defaultValue;
+function get(envName: string): string {
+    return getFromEnv(envName);
 }
 
-function getBoolean(defaultValue: boolean, envName: string): boolean {
+function getBoolean(envName: string): boolean {
     const truthyStrings = ["1", "true", "yes", "on"];
     const valueFromEnv = getFromEnv(envName);
-    return valueFromEnv === undefined ? defaultValue : truthyStrings.includes(valueFromEnv);
+    return truthyStrings.includes(valueFromEnv);
 }
 
 export function getConfig(): Config {
     return {
-        d2DockerApiUrl: get(defaultConfig.d2DockerApiUrl, "D2_DOCKER_API_URL"),
-        registryHost: get(defaultConfig.registryHost, "REGISTRY_HOST"),
-        dhis2Host: get(defaultConfig.dhis2Host, "DHIS2_HOST"),
-        hideAdvancedOptions: getBoolean(defaultConfig.hideAdvancedOptions, "HIDE_ADVANCED_OPTIONS"),
+        d2DockerApiUrl: get("D2_DOCKER_API_URL"),
+        registryHost: get("REGISTRY_HOST"),
+        dhis2Host: get("DHIS2_HOST"),
+        hideAdvancedOptions: getBoolean("HIDE_ADVANCED_OPTIONS"),
     };
 }
