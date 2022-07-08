@@ -19,10 +19,11 @@ export const App: React.FC<AppProps> = React.memo(function App() {
     useEffect(() => {
         async function setup() {
             const config = getConfig();
+            console.debug("Using config", config);
             const compositionRoot = getCompositionRoot(config);
             const isShareButtonVisible = _(appConfig).get("appearance.showShareButton") || false;
 
-            setAppContext({ compositionRoot });
+            setAppContext({ compositionRoot, config });
             setShowShareButton(isShareButtonVisible);
             setLoading(false);
         }

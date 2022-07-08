@@ -15,6 +15,7 @@ import {
     D2DockerPullRequest,
     D2DockerPushRequest,
     D2DockerCopyRequest,
+    D2DockerRmRequest,
 } from "./D2DockerApi.types";
 import { ImagesRepository } from "../../domain/repositories/ImagesRepository";
 import { Config } from "../../domain/entities/Config";
@@ -57,6 +58,14 @@ export class ImagesD2DockerApiRepository implements ImagesRepository {
         return fetchPost<D2DockerPushRequest, void>(this.getD2DockerApiUrl("/instances/push"), {
             data: {
                 image: this.getDockerDataImage(image),
+            },
+        });
+    }
+
+    public delete(image: Image): FutureData<void> {
+        return fetchPost<D2DockerRmRequest, void>(this.getD2DockerApiUrl("/instances/rm"), {
+            data: {
+                images: [this.getDockerDataImage(image)],
             },
         });
     }

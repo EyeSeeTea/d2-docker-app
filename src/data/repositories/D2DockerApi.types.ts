@@ -122,3 +122,7 @@ export interface D2DockerPushRequest {
 export interface D2DockerPullRequest {
     image: string;
 }
+
+export interface D2DockerRmRequest {
+    images: string[];
+}

@@ -8,5 +8,6 @@ export interface ImagesRepository {
     getForProject(projectName: string): FutureData<Image[]>;
     pull(image: Image): FutureData<void>;
     push(image: Image): FutureData<void>;
+    delete(image: Image): FutureData<void>;
     create(container: ContainerDefinition): FutureData<void>;
 }

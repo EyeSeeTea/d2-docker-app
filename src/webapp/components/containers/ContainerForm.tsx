@@ -20,10 +20,11 @@ export interface ContainerFormProps {
 export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
     const { close: closeContainerForm, container } = props;
 
-    const { compositionRoot } = useAppContext();
+    const { compositionRoot, config } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
     const [showAdvancedProperties, { toggle: toggleAdvancedProperties }] = useBooleanState(false);
+    const canUseAdvancedOptions = !config.hideAdvancedOptions;
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
         async formValues => {
@@ -62,7 +63,9 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
                                 <Field key={field} field={field} container={container} />
                             ))}
 
-                            <Button onClick={toggleAdvancedProperties}>{i18n.t("Advanced properties")}</Button>
+                            {canUseAdvancedOptions && (
+                                <Button onClick={toggleAdvancedProperties}>{i18n.t("Advanced options")}</Button>
+                            )}
 
                             {showAdvancedProperties &&
                                 advancedFields.map(field => <Field key={field} field={field} container={container} />)}

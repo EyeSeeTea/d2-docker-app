@@ -5,19 +5,25 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-07-07T10:46:51.450Z\n"
-"PO-Revision-Date: 2022-07-07T10:46:51.450Z\n"
+"POT-Creation-Date: 2022-07-08T08:48:58.907Z\n"
+"PO-Revision-Date: 2022-07-08T08:48:58.907Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
 
-msgid "Pull image"
+msgid "Cannot use same name for template and local image"
+msgstr ""
+
+msgid "Pull remote image"
 msgstr ""
 
 msgid "Copy image"
 msgstr ""
 
-msgid "Push image"
+msgid "Delete template image"
+msgstr ""
+
+msgid "Push new image"
 msgstr ""
 
 msgid "Stop image"
@@ -47,7 +53,7 @@ msgstr ""
 msgid "Create new container"
 msgstr ""
 
-msgid "Advanced properties"
+msgid "Advanced options"
 msgstr ""
 
 msgid "Submit"
@@ -63,6 +69,12 @@ msgid "Stop container"
 msgstr ""
 
 msgid "Commit container"
+msgstr ""
+
+msgid "Push image"
+msgstr ""
+
+msgid "Pull image"
 msgstr ""
 
 msgid "Details"
