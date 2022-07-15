@@ -19,11 +19,17 @@ $ export DHIS2_HOST=localhost
 $ yarn start
 ```
 
+Or use any .env file, for example:
+
+```
+$ npx env-cmd -f .env.efh yarn start
+```
+
 Now in your browser, go to `http://localhost:8081`.
 
 ## Build app ZIP
 
-All environment variables for `yarn start` (except for PORT) can be use on build:
+All environment variables for `yarn start` (except for PORT) can be use on build (you can also use env-cmd wrapper):
 
 ```
 $ export VAR=VALUE # Customize the build
