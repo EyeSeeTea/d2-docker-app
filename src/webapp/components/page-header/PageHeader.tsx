@@ -3,8 +3,8 @@ import { Variant } from "@material-ui/core/styles/createTypography";
 import Typography from "@material-ui/core/Typography";
 import { DialogButton } from "@eyeseetea/d2-ui-components";
 import React from "react";
-import i18n from "../../../locales";
 import styled from "styled-components";
+import i18n from "../../../utils/i18n";
 
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(props => {
     const { variant = "h5", title, onBackClick, helpText, children } = props;

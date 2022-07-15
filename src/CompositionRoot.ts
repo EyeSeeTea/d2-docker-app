@@ -1,35 +1,28 @@
-import { Instance } from "./data/entities/Instance";
-import { InstanceDefaultRepository } from "./data/repositories/InstanceDefaultRepository";
-import { GetCurrentUserUseCase } from "./domain/usecases/GetCurrentUserUseCase";
-import { GetInstanceVersionUseCase } from "./domain/usecases/GetInstanceVersionUseCase";
+import { ContainersD2DockerApiRepository } from "./data/repositories/ContainerD2DockerApiRepository";
 
-export function getCompositionRoot(instance: Instance) {
-    const instanceRepository = new InstanceDefaultRepository(instance);
+import { ListAllContainersUseCase } from "./domain/usecases/ListAllContainersUseCase";
+import { StartContainerUseCase } from "./domain/usecases/StartContainerUseCase";
+import { StopContainerUseCase } from "./domain/usecases/StopContainerUseCase";
+import { CreateContainerImageUseCase } from "./domain/usecases/CreateContainerImageUseCase";
+import { ImagesD2DockerApiRepository } from "./data/repositories/ImagesD2DockerApiRepository";
+import { CommitContainersUseCase } from "./domain/usecases/CommitContainersUseCase";
+import { ImagesUseCases } from "./domain/usecases/ImagesUseCases";
+import { Config } from "./domain/entities/Config";
+
+export function getCompositionRoot(config: Config) {
+    const containersRepository = new ContainersD2DockerApiRepository(config);
+    const imagesRepository = new ImagesD2DockerApiRepository(config);
 
     return {
-        instance: getExecute({
-            getCurrentUser: new GetCurrentUserUseCase(instanceRepository),
-            getVersion: new GetInstanceVersionUseCase(instanceRepository),
-        }),
+        container: {
+            getAll: new ListAllContainersUseCase(containersRepository),
+            start: new StartContainerUseCase(containersRepository),
+            stop: new StopContainerUseCase(containersRepository),
+            createImageAndStart: new CreateContainerImageUseCase(imagesRepository, containersRepository),
+            commit: new CommitContainersUseCase(containersRepository),
+        },
+        images: new ImagesUseCases(imagesRepository),
     };
 }
 
 export type CompositionRoot = ReturnType<typeof getCompositionRoot>;
-
-function getExecute<UseCases extends Record<Key, UseCase>, Key extends keyof UseCases>(
-    useCases: UseCases
-): { [K in Key]: UseCases[K]["execute"] } {
-    const keys = Object.keys(useCases) as Key[];
-    const initialOutput = {} as { [K in Key]: UseCases[K]["execute"] };
-
-    return keys.reduce((output, key) => {
-        const useCase = useCases[key];
-        const execute = useCase.execute.bind(useCase) as UseCases[typeof key]["execute"];
-        output[key] = execute;
-        return output;
-    }, initialOutput);
-}
-
-export interface UseCase {
-    execute: Function;
-}

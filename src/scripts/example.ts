@@ -1,6 +1,5 @@
 import { command, run, string, option } from "cmd-ts";
 import path from "path";
-import { D2Api } from "../types/d2-api";
 
 function main() {
     const cmd = command({
@@ -9,15 +8,13 @@ function main() {
         args: {
             url: option({
                 type: string,
-                long: "dhis2-url",
+                long: "url",
                 short: "u",
-                description: "DHIS2 base URL. Example: http://USERNAME:PASSWORD@localhost:8080",
+                description: "URL option",
             }),
         },
         handler: async args => {
-            const api = new D2Api({ baseUrl: args.url });
-            const info = await api.system.info.getData();
-            console.debug(info);
+            console.debug(args);
         },
     });
 

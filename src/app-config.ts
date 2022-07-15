@@ -1,5 +1,5 @@
 export const appConfig: AppConfig = {
-    appKey: "dhis2-app-skeleton",
+    appKey: "d2-docker-app",
     appearance: {
         showShareButton: true,
     },
@@ -8,7 +8,7 @@ export const appConfig: AppConfig = {
         createIssue: true,
         sendToDhis2UserGroups: ["Administrators"],
         issues: {
-            repository: "EyeSeeTea/dhis2-app-skeleton",
+            repository: "EyeSeeTea/d2-docker-app",
             title: "[User feedback] {title}",
             body: "## dhis2\n\nUsername: {username}\n\n{body}",
         },

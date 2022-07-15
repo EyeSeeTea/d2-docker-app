@@ -18,7 +18,7 @@ class Share extends React.PureComponent<ShareProps, ShareState> {
     };
 
     openMainPage = () => {
-        window.open("http://www.eyeseetea.com/", "_blank");
+        window.open("https://www.eyeseetea.com", "_blank");
     };
 
     openTwitter = () => {
