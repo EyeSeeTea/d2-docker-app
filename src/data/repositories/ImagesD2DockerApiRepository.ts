@@ -34,15 +34,16 @@ export class ImagesD2DockerApiRepository implements ImagesRepository {
     }
 
     public getForProject(project: string): FutureData<Image[]> {
-        return fetchGet<Artifact[]>(this.getHarborApiUrl(`/projects/${project}/repositories/dhis2-data/artifacts`)).map(
-            artifacts =>
-                _(artifacts)
-                    .flatMap(artifact => (artifact.type === "IMAGE" ? artifact.tags : []))
-                    .compact()
-                    .map(tag => getImageInfoFromName(tag.name))
-                    .compact()
-                    .map(attrs => buildImage({ registryUrl: this.registryHost, project, ...attrs }))
-                    .value()
+        return fetchGet<Artifact[]>(
+            this.getHarborApiUrl(`/projects/${project}/repositories/dhis2-data/artifacts?page_size=100`)
+        ).map(artifacts =>
+            _(artifacts)
+                .flatMap(artifact => (artifact.type === "IMAGE" ? artifact.tags : []))
+                .compact()
+                .map(tag => getImageInfoFromName(tag.name))
+                .compact()
+                .map(attrs => buildImage({ registryUrl: this.registryHost, project, ...attrs }))
+                .value()
         );
     }
 
