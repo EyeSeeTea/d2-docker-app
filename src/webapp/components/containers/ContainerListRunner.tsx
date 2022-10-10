@@ -29,7 +29,7 @@ interface UseActionRunnersResponse {
 
 export function useActionRunners(options: UseActionRunnersOptions): UseActionRunnersResponse {
     const { setIsLoading, refresher, setContainerForm } = options;
-    const { compositionRoot } = useAppContext();
+    const { compositionRoot, config } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
     const [confirmation, setConfirmation] = React.useState<Confirmation>();
@@ -82,7 +82,7 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                     break;
                 }
                 case "start": {
-                    const containerDefinition = getContainerDefinitionFromContainer(container);
+                    const containerDefinition = getContainerDefinitionFromContainer(config, container);
                     setContainerForm(containerDefinition);
                     break;
                 }
@@ -117,7 +117,7 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                     throw new Error(`Action not implemented: ${action}`);
             }
         },
-        [compositionRoot, runAction, setContainerForm]
+        [compositionRoot, runAction, setContainerForm, config]
     );
 
     return { onAction, confirmation: { confirmation, setConfirmation } };

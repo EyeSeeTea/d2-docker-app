@@ -55,14 +55,14 @@ export function initialContainer(config: Config): ContainerDefinition {
     };
 }
 
-export function getContainerDefinitionFromContainer(container: Container): ContainerDefinition {
+export function getContainerDefinitionFromContainer(config: Config, container: Container): ContainerDefinition {
     const { image } = container;
 
     return {
         ...initialContainer,
         projectName: image.project,
         image: image,
-        port: "8080",
+        port: config.defaultDhis2Port.toString(),
         name: image.name,
     };
 }
