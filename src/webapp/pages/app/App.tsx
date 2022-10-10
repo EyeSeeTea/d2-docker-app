@@ -8,6 +8,7 @@ import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
 import "./App.css";
 import { getConfig } from "../../config";
+import { createGenerateClassName, StylesProvider } from "@material-ui/core";
 
 export interface AppProps {}
 
@@ -33,16 +34,22 @@ export const App: React.FC<AppProps> = React.memo(function App() {
     if (loading) return null;
 
     return (
-        <SnackbarProvider>
-            <LoadingProvider>
-                <div id="app" className="content">
-                    <AppContext.Provider value={appContext}>
-                        <Router />
-                    </AppContext.Provider>
-                </div>
+        <StylesProvider generateClassName={generateClassName}>
+            <SnackbarProvider>
+                <LoadingProvider>
+                    <div id="app" className="content">
+                        <AppContext.Provider value={appContext}>
+                            <Router />
+                        </AppContext.Provider>
+                    </div>
 
-                <Share visible={showShareButton} />
-            </LoadingProvider>
-        </SnackbarProvider>
+                    <Share visible={showShareButton} />
+                </LoadingProvider>
+            </SnackbarProvider>
+        </StylesProvider>
     );
+});
+
+const generateClassName = createGenerateClassName({
+    seed: "d2da",
 });
