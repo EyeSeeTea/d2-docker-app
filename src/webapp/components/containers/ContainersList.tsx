@@ -18,6 +18,7 @@ import { useContainerActions } from "./ContainerListActions";
 import { useActionRunners } from "./ContainerListRunner";
 
 export const ContainersList: React.FC = React.memo(() => {
+    const { config } = useAppContext();
     const [_selection, _setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -37,7 +38,7 @@ export const ContainersList: React.FC = React.memo(() => {
         refresh();
     }, [setContainerForm, refresh]);
 
-    const openEmptyForm = React.useCallback(() => setContainerForm(initialContainer), []);
+    const openEmptyForm = React.useCallback(() => setContainerForm(initialContainer(config)), [config]);
 
     return (
         <div>

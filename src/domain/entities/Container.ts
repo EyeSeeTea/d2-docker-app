@@ -1,3 +1,4 @@
+import { Config } from "./Config";
 import { Image } from "./Image";
 import { Id } from "./Ref";
 
@@ -45,12 +46,14 @@ export function getLocalImageFromContainer(container: ContainerDefinitionValid):
     return { ...container.image, name: container.name };
 }
 
-export const initialContainer: ContainerDefinition = {
-    projectName: "",
-    image: undefined,
-    port: "8080",
-    name: "",
-};
+export function initialContainer(config: Config): ContainerDefinition {
+    return {
+        projectName: "",
+        image: undefined,
+        port: config.defaultDhis2Port.toString(),
+        name: "",
+    };
+}
 
 export function getContainerDefinitionFromContainer(container: Container): ContainerDefinition {
     const { image } = container;

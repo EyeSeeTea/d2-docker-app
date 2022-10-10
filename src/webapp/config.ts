@@ -7,6 +7,7 @@ export const defaultConfig: Config = {
     registryHost: "docker.eyeseetea.com",
     dhis2Host: "localhost",
     hideAdvancedOptions: false,
+    defaultDhis2Port: 8080,
 };
 
 function getFromEnv(name: string): string {
@@ -36,5 +37,6 @@ export function getConfig(): Config {
         registryHost: get("REGISTRY_HOST"),
         dhis2Host: get("DHIS2_HOST"),
         hideAdvancedOptions: getBoolean("HIDE_ADVANCED_OPTIONS"),
+        defaultDhis2Port: parseInt(get("DEFAULT_DHIS2_PORT") || "8080"),
     };
 }
