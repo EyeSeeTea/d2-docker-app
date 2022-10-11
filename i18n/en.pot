@@ -5,10 +5,13 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-07-08T08:48:58.907Z\n"
-"PO-Revision-Date: 2022-07-08T08:48:58.907Z\n"
+"POT-Creation-Date: 2022-10-11T08:57:51.259Z\n"
+"PO-Revision-Date: 2022-10-11T08:57:51.259Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
+msgstr ""
+
+msgid "Start image"
 msgstr ""
 
 msgid "Cannot use same name for template and local image"
@@ -29,9 +32,6 @@ msgstr ""
 msgid "Stop image"
 msgstr ""
 
-msgid "Start image"
-msgstr ""
-
 msgid "Add"
 msgstr ""
 
@@ -50,7 +50,10 @@ msgstr ""
 msgid "Image started successfully"
 msgstr ""
 
-msgid "Create new container"
+msgid "Start container"
+msgstr ""
+
+msgid "New container"
 msgstr ""
 
 msgid "Advanced options"
@@ -60,9 +63,6 @@ msgid "Submit"
 msgstr ""
 
 msgid "Goto DHIS2 instance"
-msgstr ""
-
-msgid "Start container"
 msgstr ""
 
 msgid "Stop container"
