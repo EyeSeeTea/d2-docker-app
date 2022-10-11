@@ -26,6 +26,7 @@ export interface ContainerDefinition {
     dhisConf?: File;
     runSql?: File;
     runScript?: File;
+    existing: boolean;
 }
 
 export type ContainerDefinitionValid = Omit<ContainerDefinition, "image"> & { image: Image };
@@ -52,6 +53,7 @@ export function initialContainer(config: Config): ContainerDefinition {
         image: undefined,
         port: config.defaultDhis2Port.toString(),
         name: "",
+        existing: false,
     };
 }
 
@@ -64,5 +66,6 @@ export function getContainerDefinitionFromContainer(config: Config, container: C
         image: image,
         port: config.defaultDhis2Port.toString(),
         name: image.name,
+        existing: true,
     };
 }

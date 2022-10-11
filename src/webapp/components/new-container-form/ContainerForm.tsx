@@ -12,14 +12,19 @@ interface ContainerFieldProps {
     container: ContainerDefinition;
 }
 
+const disabledFieldsOnEdit: ContainerFormField[] = ["projectName", "name"];
+
 export const ContainerField: React.FC<ContainerFieldProps> = ({ field, container }) => {
     const name = `container.${field}`;
     const { validation, props: validationProps = {} } = useValidations(field);
+    const isEdit = container.existing;
+
     const props = {
         name,
         placeholder: getContainerFieldName(field),
         validate: validation,
         initialValue: container[field]?.toString(),
+        disabled: isEdit && disabledFieldsOnEdit.includes(field),
         ...validationProps,
     };
 

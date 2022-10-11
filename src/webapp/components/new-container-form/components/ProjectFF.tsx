@@ -13,6 +13,7 @@ import { getContainerFieldName } from "../ContainerForm";
 export interface CategoryOptionComboFFProps {
     input: FinalFormInput;
     imageField: string;
+    disabled: boolean;
 }
 
 type Loader<Data> =
@@ -25,7 +26,7 @@ const noProjects: Project[] = [];
 const noImages: Image[] = [];
 
 export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
-    const { input: projectInput, imageField } = props;
+    const { input: projectInput, imageField, disabled } = props;
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
     const { input: imageInput } = useField<Image>(imageField);
@@ -114,7 +115,12 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
 
     return (
         <React.Fragment>
-            <SingleSelectField onChange={onChange} selected={projectSelected} loading={isProjectsLoading}>
+            <SingleSelectField
+                disabled={disabled}
+                onChange={onChange}
+                selected={projectSelected}
+                loading={isProjectsLoading}
+            >
                 {projectOptions.map(({ value, label }) => (
                     <SingleSelectOption value={value} label={label} key={value} />
                 ))}
@@ -125,6 +131,7 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
                     <Row>{getContainerFieldName("image")}</Row>
 
                     <SingleSelectField
+                        disabled={disabled}
                         onChange={onChangeOptionCombo}
                         selected={imageInput.value.id}
                         loading={isArtifactsLoading}

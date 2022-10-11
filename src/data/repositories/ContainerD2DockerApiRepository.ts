@@ -43,6 +43,7 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
             data: {
                 image: this.getDockerDataImage(image),
                 detach: true,
+                keep_containers: true,
             },
         });
     }
@@ -53,6 +54,7 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
                 image: this.getDockerDataImage(getLocalImageFromContainer(definition)),
                 detach: true,
                 port: parseInt(definition.port),
+                keep_containers: definition.existing,
             },
         }).map(() => ({ url: this.getDhis2PublicUrl(definition.port) }));
     }

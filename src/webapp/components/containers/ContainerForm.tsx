@@ -28,14 +28,17 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
         async formValues => {
-            const container = formValues.container as ContainerDefinitionValid;
+            const containerFromForm = {
+                ...(formValues.container as ContainerDefinitionValid),
+                existing: container?.existing ?? false,
+            };
 
             const onProgress = (msg: string, progressPercent: number) => {
                 loading.show(true, msg);
                 loading.updateProgress(progressPercent);
             };
 
-            return compositionRoot.container.createImageAndStart.execute(container, { onProgress }).run(
+            return compositionRoot.container.createImageAndStart.execute(containerFromForm, { onProgress }).run(
                 () => {
                     loading.hide();
                     snackbar.success(i18n.t("Image started successfully"));
@@ -47,13 +50,16 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
                 }
             );
         },
-        [snackbar, loading, compositionRoot, closeContainerForm]
+        [snackbar, loading, compositionRoot, closeContainerForm, container]
     );
 
     if (!container) return null;
 
+    const isEdit = container.existing;
+    const title = isEdit ? i18n.t("Start container") : i18n.t("New container");
+
     return (
-        <ConfirmationDialog isOpen={true} title={i18n.t("Create new container")} maxWidth="lg" fullWidth>
+        <ConfirmationDialog isOpen={true} title={title} maxWidth="lg" fullWidth>
             <DialogContent>
                 <Form
                     onSubmit={onSubmit}

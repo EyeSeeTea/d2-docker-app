@@ -19,9 +19,6 @@ export class CreateContainerImageUseCase {
         const localImage = getLocalImageFromContainer(container);
         const steps = 6;
 
-        if (_.isEqual(localImage, templateImage))
-            return Future.error(i18n.t("Cannot use same name for template and local image"));
-
         function run<T>(action: FutureData<T>, msg: string, image: Image, step: number): FutureData<T> {
             return emptyFuture().flatMap(() => {
                 const percent = (step / (steps + 1)) * 100;
@@ -36,20 +33,31 @@ export class CreateContainerImageUseCase {
             return _(containers).some(container => _.isEqual(container.image, templateImage));
         });
 
-        return templateImageExistedInLocal$.flatMap(templateImageExistsInLocal => {
-            return emptyFuture()
-                .flatMap(() => run(imagesRepo.pull(templateImage), i18n.t("Pull remote image"), templateImage, 1))
-                .flatMap(() => run(imagesRepo.create(container), i18n.t("Copy image"), localImage, 2))
-                .flatMap(() =>
-                    templateImageExistsInLocal
-                        ? noop$
-                        : run(imagesRepo.delete(templateImage), i18n.t("Delete template image"), localImage, 3)
-                )
-                .flatMap(() => run(imagesRepo.push(localImage), i18n.t("Push new image"), localImage, 4))
-                .flatMap(() => run(containersRepo.stop(localImage), i18n.t("Stop image"), localImage, 5))
-                .flatMap(() => run(containersRepo.startInitial(container), i18n.t("Start image"), localImage, steps))
-                .flatMap(({ url }) => this.openInBrowser(url));
-        });
+        if (container.existing) {
+            return run(containersRepo.startInitial(container), i18n.t("Start image"), localImage, 1).map(
+                () => undefined
+            );
+        } else {
+            if (_.isEqual(localImage, templateImage))
+                return Future.error(i18n.t("Cannot use same name for template and local image"));
+
+            return templateImageExistedInLocal$.flatMap(templateImageExistsInLocal => {
+                return emptyFuture()
+                    .flatMap(() => run(imagesRepo.pull(templateImage), i18n.t("Pull remote image"), templateImage, 1))
+                    .flatMap(() => run(imagesRepo.create(container), i18n.t("Copy image"), localImage, 2))
+                    .flatMap(() =>
+                        templateImageExistsInLocal
+                            ? noop$
+                            : run(imagesRepo.delete(templateImage), i18n.t("Delete template image"), localImage, 3)
+                    )
+                    .flatMap(() => run(imagesRepo.push(localImage), i18n.t("Push new image"), localImage, 4))
+                    .flatMap(() => run(containersRepo.stop(localImage), i18n.t("Stop image"), localImage, 5))
+                    .flatMap(() =>
+                        run(containersRepo.startInitial(container), i18n.t("Start image"), localImage, steps)
+                    )
+                    .flatMap(({ url }) => this.openInBrowser(url));
+            });
+        }
     }
 
     private openInBrowser(url: string): FutureData<void> {

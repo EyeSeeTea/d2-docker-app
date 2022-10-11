@@ -105,6 +105,7 @@ export interface D2DockerStartRequest {
     image: string;
     detach: boolean;
     port?: number;
+    keep_containers: boolean;
 }
 
 export interface D2DockerStopRequest {
