@@ -44,6 +44,11 @@ export class Future<E, D> {
         });
     }
 
+    tap(effect: () => void): Future<E, D> {
+        effect();
+        return this;
+    }
+
     /* Static methods */
     static noCancel: Cancel = () => {};
 
@@ -116,3 +121,11 @@ export type Cancel = () => void;
 
 export type Computation<E, D> = (resolve: Fn<D>, reject: Fn<E>) => fluture.Cancel;
 export type FutureData<Data> = Future<string, Data>;
+
+export function emptyFuture(): FutureData<void> {
+    return Future.success<void, string>(undefined);
+}
+
+export function initFuture(action: () => void): FutureData<void> {
+    return emptyFuture().map(action);
+}
