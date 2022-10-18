@@ -1,6 +1,6 @@
 {
     "short_name": "D2 Docker App",
-    "name": "D2 Docker App for EFH Pilot",
+    "name": "D2 Docker App",
     "icons": [
         {
             "src": "favicon.ico",
