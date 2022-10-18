@@ -2,7 +2,7 @@
     "launch_path": "index.html",
     "default_locale": "en",
     "name": "D2 Docker App",
-    "description": "D2 Docker App for EFH Pilot",
+    "description": "D2 Docker App",
     "developer": {
         "url": "https://www.eyeseetea.com/",
         "name": "EyeSeeTea team"
