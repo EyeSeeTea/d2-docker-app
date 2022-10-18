@@ -5,13 +5,151 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-08-25T12:21:36.218Z\n"
-"PO-Revision-Date: 2021-08-25T12:21:36.218Z\n"
+"POT-Creation-Date: 2022-10-11T08:57:51.259Z\n"
+"PO-Revision-Date: 2022-10-11T08:57:51.259Z\n"
+
+msgid "API error code: {{statusText}} ({{status}})"
+msgstr ""
+
+msgid "Start image"
+msgstr ""
+
+msgid "Cannot use same name for template and local image"
+msgstr ""
+
+msgid "Pull remote image"
+msgstr ""
+
+msgid "Copy image"
+msgstr ""
+
+msgid "Delete template image"
+msgstr ""
+
+msgid "Push new image"
+msgstr ""
+
+msgid "Stop image"
+msgstr ""
 
 msgid "Add"
 msgstr ""
 
 msgid "List"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+msgid "Image started successfully"
+msgstr ""
+
+msgid "Start container"
+msgstr ""
+
+msgid "New container"
+msgstr ""
+
+msgid "Advanced options"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Goto DHIS2 instance"
+msgstr ""
+
+msgid "Stop container"
+msgstr ""
+
+msgid "Commit container"
+msgstr ""
+
+msgid "Push image"
+msgstr ""
+
+msgid "Pull image"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Container stopped"
+msgstr ""
+
+msgid "Container commited"
+msgstr ""
+
+msgid "Push images"
+msgstr ""
+
+msgid "Image pushed"
+msgstr ""
+
+msgid "Pull images"
+msgstr ""
+
+msgid "Image pulled"
+msgstr ""
+
+msgid "Search by name"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Open DHIS2 instance"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Drag and drop some files here, or click to select files"
+msgstr ""
+
+msgid "Project"
+msgstr ""
+
+msgid "Image"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Database Port"
+msgstr ""
+
+msgid "Deploy Path Namespace (i.e: `my-dhis2` serves `http://HOST:PORT/my-dhis2`)"
+msgstr ""
+
+msgid "Java OPT (Gigabytes of RAM)"
+msgstr ""
+
+msgid "Tomcat Server XML"
+msgstr ""
+
+msgid "DHIS Conf"
+msgstr ""
+
+msgid "Run SQL"
+msgstr ""
+
+msgid "Run Shell Script"
+msgstr ""
+
+msgid "Port should be greater than 0"
+msgstr ""
+
+msgid "Port should be smaller than 65535"
 msgstr ""
 
 msgid "Back"

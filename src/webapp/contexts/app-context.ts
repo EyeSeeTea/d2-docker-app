@@ -1,12 +1,10 @@
 import React, { useContext } from "react";
 import { CompositionRoot } from "../../CompositionRoot";
-import { User } from "../../domain/entities/User";
-import { D2Api } from "../../types/d2-api";
+import { Config } from "../../domain/entities/Config";
 
 export interface AppContextState {
-    api: D2Api;
-    currentUser: User;
     compositionRoot: CompositionRoot;
+    config: Config;
 }
 
 export const AppContext = React.createContext<AppContextState | null>(null);
