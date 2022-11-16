@@ -2,7 +2,7 @@ import { Container } from "../entities/Container";
 import { FutureData } from "../entities/Future";
 import { ContainersRepository } from "../repositories/ContainersRepository";
 
-export class GetContainerLogsUseCase {
+export class DownloadContainerLogsUseCase {
     constructor(private containersRepository: ContainersRepository) {}
 
     public execute(container: Container): FutureData<void> {

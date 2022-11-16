@@ -86,7 +86,7 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
     public downloadLogs(container: Container, options: { limit: number }): FutureData<void> {
         const url = this.getD2DockerApiUrl<D2DockerDownloadLogsRequest>("/instances/logs", {
             image: this.getDockerDataImage(container.image),
-            limit: options.limit,
+            limit: options.limit.toString(),
         });
         downloadFromUrl(url);
         return Future.success(undefined);
@@ -108,11 +108,9 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
         return _.compact(parts).join("/");
     }
 
-    private getD2DockerApiUrl<Params>(path: string, params?: Params): string {
+    private getD2DockerApiUrl<Params extends Record<string, string>>(path: string, params?: Params): string {
         const path2 = path.replace(/^\//, "");
-        const queryString = params
-            ? new URLSearchParams(params as unknown as Record<string, string>).toString()
-            : undefined;
+        const queryString = params ? new URLSearchParams(params).toString() : undefined;
         return this.d2DockerApiUrl + "/" + path2 + (queryString ? `?${queryString}` : "");
     }
 
