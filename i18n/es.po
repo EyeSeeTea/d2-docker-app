@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2022-10-11T08:57:51.259Z\n"
+"POT-Creation-Date: 2022-11-16T10:02:32.116Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,6 +68,12 @@ msgstr ""
 msgid "Stop container"
 msgstr ""
 
+msgid "Download logs"
+msgstr ""
+
+msgid "Download database"
+msgstr ""
+
 msgid "Commit container"
 msgstr ""
 
@@ -81,6 +87,12 @@ msgid "Details"
 msgstr ""
 
 msgid "Container stopped"
+msgstr ""
+
+msgid "Download container logs"
+msgstr ""
+
+msgid "Download container database (sql.gz)"
 msgstr ""
 
 msgid "Container commited"

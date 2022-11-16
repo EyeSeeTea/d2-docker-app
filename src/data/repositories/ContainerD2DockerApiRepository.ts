@@ -1,12 +1,20 @@
 import _ from "lodash";
-import { FutureData } from "../../domain/entities/Future";
+import { Future, FutureData } from "../../domain/entities/Future";
 import { ContainersRepository } from "../../domain/repositories/ContainersRepository";
 import { Container, getLocalImageFromContainer, ContainerDefinitionValid } from "../../domain/entities/Container";
 import { buildImage, Image } from "../../domain/entities/Image";
 import { fetchGet, fetchPost } from "../utils/future-fetch";
-import { InstancesGetResponse, D2DockerStartRequest, D2DockerStopRequest, ApiContainer } from "./D2DockerApi.types";
+import {
+    InstancesGetResponse,
+    D2DockerStartRequest,
+    D2DockerStopRequest,
+    ApiContainer,
+    D2DockerDownloadLogsRequest,
+    D2DockerDownloadDatabaseRequest,
+} from "./D2DockerApi.types";
 import { Config } from "../../domain/entities/Config";
 import { Maybe } from "../../types/utils";
+import { downloadFromUrl } from "../utils/download";
 
 export class ContainersD2DockerApiRepository implements ContainersRepository {
     d2DockerApiUrl: string;
@@ -75,6 +83,23 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
         });
     }
 
+    public downloadLogs(container: Container, options: { limit: number }): FutureData<void> {
+        const url = this.getD2DockerApiUrl<D2DockerDownloadLogsRequest>("/instances/logs", {
+            image: this.getDockerDataImage(container.image),
+            limit: options.limit,
+        });
+        downloadFromUrl(url);
+        return Future.success(undefined);
+    }
+
+    public downloadDatabase(container: Container): FutureData<void> {
+        const url = this.getD2DockerApiUrl<D2DockerDownloadDatabaseRequest>("/instances/db", {
+            image: this.getDockerDataImage(container.image),
+        });
+        downloadFromUrl(url);
+        return Future.success(undefined);
+    }
+
     /* Private methods */
 
     private getDockerDataImage(image: Image): string {
@@ -83,9 +108,12 @@ export class ContainersD2DockerApiRepository implements ContainersRepository {
         return _.compact(parts).join("/");
     }
 
-    private getD2DockerApiUrl(path: string): string {
+    private getD2DockerApiUrl<Params>(path: string, params?: Params): string {
         const path2 = path.replace(/^\//, "");
-        return this.d2DockerApiUrl + "/" + path2;
+        const queryString = params
+            ? new URLSearchParams(params as unknown as Record<string, string>).toString()
+            : undefined;
+        return this.d2DockerApiUrl + "/" + path2 + (queryString ? `?${queryString}` : "");
     }
 
     private getHarborPublicDataImageUrl(image: Image): string | undefined {

@@ -3,6 +3,8 @@ import i18n from "@eyeseetea/d2-ui-components/locales";
 import { CloudDownload, CloudUpload, LocalHospital, SaveAlt } from "@material-ui/icons";
 import DetailsIcon from "@material-ui/icons/Details";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import LogsIcon from "@material-ui/icons/Save";
+import DatabaseIcon from "@material-ui/icons/NextWeekSharp";
 import StopIcon from "@material-ui/icons/Stop";
 
 import _ from "lodash";
@@ -10,7 +12,7 @@ import React from "react";
 import { Container } from "../../../domain/entities/Container";
 import { Id } from "../../../domain/entities/Ref";
 
-type Action = "start" | "stop" | "goToDhis2" | "commit" | "push" | "pull";
+type Action = "start" | "stop" | "goToDhis2" | "commit" | "push" | "pull" | "logs" | "download-db";
 
 export interface UseContainerActionsOptions {
     rows: Container[];
@@ -59,6 +61,14 @@ export function useContainerActions(options: UseContainerActionsOptions): {
             multiple: true,
             icon: <StopIcon />,
             isActive: forRunningContainers,
+        }),
+        action("logs", i18n.t("Download logs"), {
+            multiple: false,
+            icon: <LogsIcon />,
+        }),
+        action("download-db", i18n.t("Download database"), {
+            multiple: false,
+            icon: <DatabaseIcon />,
         }),
         action("commit", i18n.t("Commit container"), {
             multiple: true,
