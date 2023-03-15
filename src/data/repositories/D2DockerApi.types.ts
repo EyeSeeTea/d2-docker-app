@@ -112,6 +112,15 @@ export interface D2DockerStopRequest {
     image: string;
 }
 
+export type D2DockerDownloadLogsRequest = {
+    image: string;
+    limit?: string;
+};
+
+export type D2DockerDownloadDatabaseRequest = {
+    image: string;
+};
+
 export interface D2DockerCommitRequest {
     image: string;
 }

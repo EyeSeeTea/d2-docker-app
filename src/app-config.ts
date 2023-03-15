@@ -11,12 +11,12 @@ export const appConfig: AppConfig = {
             listId: "168819678",
             title: "[User feedback] {title}",
             body: "## dhis2\n\nUsername: {username}\n\n{body}",
-            status: "Misc"
+            status: "Misc",
         },
         feedbackOptions: {
             showContact: false,
-            descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n"
-        }
+            descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n",
+        },
     },
 };
 
@@ -28,7 +28,7 @@ export interface AppConfig {
     feedback?: {
         createIssue: boolean;
         sendToDhis2UserGroups: string[];
-        clickUp: object,
+        clickUp: object;
         feedbackOptions: object;
     };
 }
