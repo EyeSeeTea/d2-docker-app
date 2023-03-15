@@ -39,7 +39,7 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
         (options: {
             askConfirmation?: boolean;
             actionMsg: string;
-            successMsg: string;
+            successMsg?: string;
             action: () => FutureData<void>;
         }) => {
             const { askConfirmation = false, actionMsg, successMsg, action } = options;
@@ -50,7 +50,7 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                     .flatMap(action)
                     .run(
                         () => {
-                            snackbar.success(successMsg);
+                            if (successMsg) snackbar.success(successMsg);
                             refresh();
                             loading.hide();
                             setIsLoading(false);
@@ -91,6 +91,16 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                         actionMsg: i18n.t("Stop container") + names,
                         successMsg: i18n.t("Container stopped") + names,
                         action: () => compositionRoot.container.stop.execute(getImages(containers)),
+                    });
+                case "logs":
+                    return runAction({
+                        actionMsg: i18n.t("Download container logs") + names,
+                        action: () => compositionRoot.container.downloadLogs.execute(container),
+                    });
+                case "download-db":
+                    return runAction({
+                        actionMsg: i18n.t("Download container database (sql.gz)") + names,
+                        action: () => compositionRoot.container.downloadDatabase.execute(container),
                     });
                 case "commit":
                     return runAction({

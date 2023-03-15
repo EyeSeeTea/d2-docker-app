@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2022-10-11T08:57:51.259Z\n"
-"PO-Revision-Date: 2022-10-11T08:57:51.259Z\n"
+"POT-Creation-Date: 2022-11-16T10:02:32.116Z\n"
+"PO-Revision-Date: 2022-11-16T10:02:32.116Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -68,6 +68,12 @@ msgstr ""
 msgid "Stop container"
 msgstr ""
 
+msgid "Download logs"
+msgstr ""
+
+msgid "Download database"
+msgstr ""
+
 msgid "Commit container"
 msgstr ""
 
@@ -81,6 +87,12 @@ msgid "Details"
 msgstr ""
 
 msgid "Container stopped"
+msgstr ""
+
+msgid "Download container logs"
+msgstr ""
+
+msgid "Download container database (sql.gz)"
 msgstr ""
 
 msgid "Container commited"
