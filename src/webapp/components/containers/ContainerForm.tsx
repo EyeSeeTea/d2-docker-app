@@ -11,6 +11,7 @@ import { ContainerDefinition, ContainerDefinitionValid } from "../../../domain/e
 import { useLoading } from "@eyeseetea/d2-ui-components";
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { useAppContext } from "../../contexts/app-context";
+import { noCancel } from "../../hooks/useCallbackEffect";
 
 export interface ContainerFormProps {
     close(): void;
@@ -28,27 +29,35 @@ export const ContainerForm: React.FC<ContainerFormProps> = React.memo(props => {
 
     const onSubmit = React.useCallback<FormProps["onSubmit"]>(
         async formValues => {
-            const containerFromForm = {
-                ...(formValues.container as ContainerDefinitionValid),
+            const res = ContainerDefinitionValid.validate({
+                ...formValues.container,
                 existing: container?.existing ?? false,
-            };
+            });
 
             const onProgress = (msg: string, progressPercent: number) => {
                 loading.show(true, msg);
                 loading.updateProgress(progressPercent);
             };
 
-            return compositionRoot.container.createImageAndStart.execute(containerFromForm, { onProgress }).run(
-                () => {
-                    loading.hide();
-                    snackbar.success(i18n.t("Image started successfully"));
-                    closeContainerForm();
+            return res.match({
+                success(containerFromForm) {
+                    return compositionRoot.container.createImageAndStart.execute(containerFromForm, { onProgress }).run(
+                        () => {
+                            loading.hide();
+                            snackbar.success(i18n.t("Image started successfully"));
+                            closeContainerForm();
+                        },
+                        error => {
+                            loading.hide();
+                            snackbar.error(error);
+                        }
+                    );
                 },
-                error => {
-                    loading.hide();
-                    snackbar.error(error);
-                }
-            );
+                error(message) {
+                    snackbar.error(message);
+                    return noCancel;
+                },
+            });
         },
         [snackbar, loading, compositionRoot, closeContainerForm, container]
     );
