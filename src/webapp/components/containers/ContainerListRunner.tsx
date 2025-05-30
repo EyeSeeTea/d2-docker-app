@@ -45,8 +45,9 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
             successMsg?: string;
             action: () => FutureData<void>;
             body?: React.ReactNode;
+            message?: string;
         }) => {
-            const { askConfirmation = false, actionMsg, successMsg, action, body } = options;
+            const { askConfirmation = false, actionMsg, successMsg, action, body, message } = options;
 
             function run() {
                 return initFuture(() => loading.show(true, actionMsg))
@@ -68,7 +69,7 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
             }
 
             if (askConfirmation) {
-                setConfirmation({ message: actionMsg, action: run, body });
+                setConfirmation({ message: message || actionMsg, action: run, body });
             } else {
                 return run();
             }
@@ -109,7 +110,8 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                 case "commit":
                     return runAction({
                         askConfirmation: true,
-                        actionMsg: i18n.t("Commit containers"),
+                        actionMsg: i18n.t("Commit containers") + names,
+                        message: i18n.t("Commit containers"),
                         body: <ContainerList containers={containers} />,
                         successMsg: i18n.t("Container commited") + names,
                         action: () => compositionRoot.container.commit.execute(containers),
@@ -117,7 +119,8 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                 case "push":
                     return runAction({
                         askConfirmation: true,
-                        actionMsg: i18n.t("Push images"),
+                        actionMsg: i18n.t("Push images") + names,
+                        message: i18n.t("Push images"),
                         body: <ContainerList containers={containers} />,
                         successMsg: i18n.t("Image pushed") + names,
                         action: () => compositionRoot.images.push(getImages(containers)),
@@ -125,7 +128,8 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                 case "pull":
                     return runAction({
                         askConfirmation: true,
-                        actionMsg: i18n.t("Pull images"),
+                        actionMsg: i18n.t("Pull images") + names,
+                        message: i18n.t("Pull images"),
                         body: <ContainerList containers={containers} />,
                         successMsg: i18n.t("Image pulled") + names,
                         action: () => compositionRoot.images.pull(getImages(containers)),
@@ -133,7 +137,8 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                 case "delete":
                     return runAction({
                         askConfirmation: true,
-                        actionMsg: i18n.t(
+                        actionMsg: i18n.t("Delete containers") + names,
+                        message: i18n.t(
                             "You’re about to permanently delete the following containers. Any data saved locally inside them will be lost. This action cannot be undone."
                         ),
                         body: <ContainerList containers={containers} warning={true} />,

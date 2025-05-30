@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2025-05-30T08:57:28.710Z\n"
-"PO-Revision-Date: 2025-05-30T08:57:28.710Z\n"
+"POT-Creation-Date: 2025-05-30T09:07:19.796Z\n"
+"PO-Revision-Date: 2025-05-30T09:07:19.796Z\n"
 
 msgid "API error code: {{statusText}} ({{status}})"
 msgstr ""
@@ -116,12 +116,15 @@ msgstr ""
 msgid "Image pulled"
 msgstr ""
 
-msgid "Deleted"
+msgid "Delete containers"
 msgstr ""
 
 msgid ""
 "You’re about to permanently delete the following containers. Any data saved "
 "locally inside them will be lost. This action cannot be undone."
+msgstr ""
+
+msgid "Deleted"
 msgstr ""
 
 msgid "Search by name"
