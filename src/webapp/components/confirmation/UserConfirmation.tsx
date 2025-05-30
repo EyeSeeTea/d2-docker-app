@@ -9,6 +9,7 @@ export interface ConfirmationProps {
 
 export interface Confirmation {
     message: string;
+    body?: React.ReactNode;
     action(): void;
 }
 
@@ -24,7 +25,7 @@ export const UserConfirmation: React.FC<ConfirmationProps> = props => {
     const closeConfirmation = React.useCallback(() => setConfirmation(undefined), [setConfirmation]);
     if (!confirmation) return null;
 
-    const { message, action } = confirmation;
+    const { message, action, body } = confirmation;
 
     return (
         <ConfirmationDialog
@@ -35,6 +36,7 @@ export const UserConfirmation: React.FC<ConfirmationProps> = props => {
             onSave={action}
             onCancel={closeConfirmation}
         >
+            {body}
             {i18n.t("Are you sure?")}
         </ConfirmationDialog>
     );
