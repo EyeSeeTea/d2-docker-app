@@ -123,6 +123,13 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                         successMsg: i18n.t("Image pulled") + names,
                         action: () => compositionRoot.images.pull(getImages(containers)),
                     });
+                case "delete":
+                    return runAction({
+                        askConfirmation: true,
+                        actionMsg: i18n.t("Delete container") + names,
+                        successMsg: i18n.t("Deleted") + names,
+                        action: () => compositionRoot.images.delete(getImages(containers)),
+                    });
                 default:
                     throw new Error(`Action not implemented: ${action}`);
             }

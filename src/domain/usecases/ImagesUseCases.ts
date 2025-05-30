@@ -22,6 +22,10 @@ export class ImagesUseCases {
         return this.run(images, image => this.imagesRepository.pull(image));
     }
 
+    public delete(images: Image[]) {
+        return this.run(images, image => this.imagesRepository.delete(image));
+    }
+
     private run(images: Image[], action: (image: Image) => FutureData<unknown>): FutureData<void> {
         const actions$ = images.map(image => action(image));
         return Future.parallel(actions$).map(() => undefined);
