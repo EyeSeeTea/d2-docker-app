@@ -4,6 +4,7 @@ import {
     TableColumn,
     TableInitialState,
     TableSelection,
+    TableState,
     useSnackbar,
 } from "@eyeseetea/d2-ui-components";
 import React, { useMemo, useState } from "react";
@@ -19,7 +20,7 @@ import { useActionRunners } from "./ContainerListRunner";
 
 export const ContainersList: React.FC = React.memo(() => {
     const { config } = useAppContext();
-    const [_selection, _setSelection] = useState<TableSelection[]>([]);
+    const [selection, setSelection] = useState<TableSelection[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [containerForm, setContainerForm] = React.useState<ContainerDefinition>();
@@ -29,7 +30,7 @@ export const ContainersList: React.FC = React.memo(() => {
     const details = getDetails();
 
     const rows = useContainerLoader({ setIsLoading, refresher });
-    const { onAction, confirmation } = useActionRunners({ setIsLoading, refresher, setContainerForm });
+    const { onAction, confirmation } = useActionRunners({ setIsLoading, refresher, setContainerForm, setSelection });
     const { actions } = useContainerActions({ rows, onAction });
     const { refresh } = refresher;
 
@@ -40,6 +41,9 @@ export const ContainersList: React.FC = React.memo(() => {
 
     const openEmptyForm = React.useCallback(() => setContainerForm(initialContainer(config)), [config]);
 
+    const onTableChange = React.useCallback(({ selection }: TableState<Container>) => {
+        setSelection(selection);
+    }, []);
     return (
         <div>
             <ContainerForm close={closeFormAndReloadList} container={containerForm} />
@@ -55,6 +59,8 @@ export const ContainersList: React.FC = React.memo(() => {
                 details={details}
                 searchBoxLabel={i18n.t("Search by name")}
                 onActionButtonClick={openEmptyForm}
+                selection={selection}
+                onChange={onTableChange}
             />
         </div>
     );
