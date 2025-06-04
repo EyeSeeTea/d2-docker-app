@@ -1,6 +1,6 @@
 import { TableAction } from "@eyeseetea/d2-ui-components";
 import i18n from "@eyeseetea/d2-ui-components/locales";
-import { CloudDownload, CloudUpload, Storage, SaveAlt } from "@material-ui/icons";
+import { CloudDownload, CloudUpload, Storage, SaveAlt, DeleteForever } from "@material-ui/icons";
 import DetailsIcon from "@material-ui/icons/Details";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import LogsIcon from "@material-ui/icons/Save";
@@ -12,7 +12,7 @@ import React from "react";
 import { Container } from "../../../domain/entities/Container";
 import { Id } from "../../../domain/entities/Ref";
 
-type Action = "start" | "stop" | "goToDhis2" | "commit" | "push" | "pull" | "logs" | "download-db";
+type Action = "start" | "stop" | "goToDhis2" | "commit" | "push" | "pull" | "logs" | "download-db" | "delete";
 
 export interface UseContainerActionsOptions {
     rows: Container[];
@@ -83,6 +83,11 @@ export function useContainerActions(options: UseContainerActionsOptions): {
         action("pull", i18n.t("Pull image"), {
             multiple: true,
             icon: <CloudDownload />,
+        }),
+        action("delete", i18n.t("Delete container"), {
+            multiple: true,
+            icon: <DeleteForever />,
+            isActive: forStoppedContainers,
         }),
         {
             name: "details",

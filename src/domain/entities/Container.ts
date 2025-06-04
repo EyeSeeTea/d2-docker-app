@@ -1,6 +1,8 @@
 import { Config } from "./Config";
+import { Either } from "./Either";
 import { Image } from "./Image";
 import { Id } from "./Ref";
+import { Struct } from "./Struct";
 
 export interface Container {
     id: Id;
@@ -13,7 +15,7 @@ export interface Container {
 
 export type ContainerStatus = "RUNNING" | "STOPPED";
 
-export interface ContainerDefinition {
+interface ContainerDefinitionProps {
     projectName: string;
     image: Image | undefined;
     port: string;
@@ -29,7 +31,23 @@ export interface ContainerDefinition {
     existing: boolean;
 }
 
-export type ContainerDefinitionValid = Omit<ContainerDefinition, "image"> & { image: Image };
+const nameRegex = /^[a-z0-9-]+$/;
+
+export class ContainerDefinition extends Struct<ContainerDefinitionProps>() {}
+
+type ContainerDefinitionValidProps = Omit<ContainerDefinition, "image"> & { image: Image };
+
+export class ContainerDefinitionValid extends Struct<ContainerDefinitionValidProps>() {
+    static validate(props: ContainerDefinitionValidProps): Either<string, ContainerDefinitionValid> {
+        if (!nameRegex.test(props.name)) {
+            return Either.error(
+                `Invalid container name, valid characters are: lower case letters, digits, and hyphen (-)`
+            );
+        } else {
+            return Either.success(new ContainerDefinitionValid(props));
+        }
+    }
+}
 
 export function getImageInfoFromName(name: string): Pick<Image, "dhis2Version" | "name"> | undefined {
     const match = name.match(/^([\d.]+)-(.*)$/);
@@ -48,24 +66,24 @@ export function getLocalImageFromContainer(container: ContainerDefinitionValid):
 }
 
 export function initialContainer(config: Config): ContainerDefinition {
-    return {
+    return new ContainerDefinition({
         projectName: "",
         image: undefined,
         port: config.defaultDhis2Port.toString(),
         name: "",
         existing: false,
-    };
+    });
 }
 
 export function getContainerDefinitionFromContainer(config: Config, container: Container): ContainerDefinition {
     const { image } = container;
 
-    return {
+    return new ContainerDefinition({
         ...initialContainer,
         projectName: image.project,
         image: image,
         port: config.defaultDhis2Port.toString(),
         name: image.name,
         existing: true,
-    };
+    });
 }
