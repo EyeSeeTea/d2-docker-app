@@ -1,4 +1,4 @@
-import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
+import { TableSelection, useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import i18n from "@eyeseetea/d2-ui-components/locales";
 import React from "react";
 import {
@@ -21,6 +21,7 @@ export interface UseActionRunnersOptions {
     setIsLoading(state: boolean): void;
     refresher: Refresher;
     setContainerForm(container: ContainerDefinition): void;
+    setSelection(selection: TableSelection[]): void;
 }
 
 type OnAction = UseContainerActionsOptions["onAction"];
@@ -31,7 +32,7 @@ interface UseActionRunnersResponse {
 }
 
 export function useActionRunners(options: UseActionRunnersOptions): UseActionRunnersResponse {
-    const { setIsLoading, refresher, setContainerForm } = options;
+    const { setIsLoading, refresher, setContainerForm, setSelection } = options;
     const { compositionRoot, config } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
@@ -143,7 +144,7 @@ export function useActionRunners(options: UseActionRunnersOptions): UseActionRun
                         ),
                         body: <ContainerList containers={containers} warning={true} />,
                         successMsg: i18n.t("Deleted") + names,
-                        action: () => compositionRoot.images.delete(getImages(containers)),
+                        action: () => compositionRoot.images.delete(getImages(containers)).map(() => setSelection([])),
                     });
                 default:
                     throw new Error(`Action not implemented: ${action}`);
