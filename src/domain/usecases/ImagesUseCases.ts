@@ -22,7 +22,7 @@ export class ImagesUseCases {
         return this.run(images, image => this.imagesRepository.pull(image));
     }
 
-    public delete(images: Image[]) {
+    public delete(images: Image[]): FutureData<void> {
         return this.run(images, image => this.imagesRepository.delete(image));
     }
 
