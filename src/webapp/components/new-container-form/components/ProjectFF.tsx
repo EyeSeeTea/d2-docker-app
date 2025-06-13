@@ -1,4 +1,5 @@
-import { FinalFormInput, SingleSelectField, SingleSelectFieldProps, SingleSelectOption } from "@dhis2/ui";
+import { FinalFormInput } from "@dhis2/ui";
+import { SelectInput } from "../../form/SelectInput";
 import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import _ from "lodash";
 import React, { useCallback, useState, useEffect } from "react";
@@ -83,12 +84,13 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
         imageInputOnChange(_.first(images));
     }, [images, imageInputOnChange]);
 
-    const onChange = useCallback<NonNullable<SingleSelectFieldProps["onChange"]>>(
-        ({ selected }, ev) => {
+    const onChange = useCallback(
+        (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+            const selected = event.target.value;
             const project = projects.find(project => project.name === selected);
 
             if (project && projectInput.onChange) {
-                projectInput.onChange(project.name, ev);
+                projectInput.onChange(project.name, event);
                 imageInput.onChange(undefined);
             }
         },
@@ -96,7 +98,8 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
     );
 
     const onChangeOptionCombo = useCallback(
-        ({ selected }) => {
+        (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+            const selected = event.target.value;
             const selectedImage = images.find(image => image.id === selected);
 
             if (selectedImage) {
@@ -115,31 +118,25 @@ export const ProjectFF: React.FC<CategoryOptionComboFFProps> = props => {
 
     return (
         <React.Fragment>
-            <SingleSelectField
+            <SelectInput
+                value={projectSelected || ""}
+                options={projectOptions}
                 disabled={disabled}
                 onChange={onChange}
-                selected={projectSelected}
                 loading={isProjectsLoading}
-            >
-                {projectOptions.map(({ value, label }) => (
-                    <SingleSelectOption value={value} label={label} key={value} />
-                ))}
-            </SingleSelectField>
+            />
 
             {someProjectSelected && (
                 <React.Fragment>
                     <Row>{getContainerFieldName("image")}</Row>
 
-                    <SingleSelectField
+                    <SelectInput
+                        value={imageInput.value?.id || ""}
+                        options={imageOptions}
                         disabled={disabled}
                         onChange={onChangeOptionCombo}
-                        selected={imageInput.value.id}
                         loading={isArtifactsLoading}
-                    >
-                        {imageOptions.map(({ value, label }) => (
-                            <SingleSelectOption value={value} label={label} key={value} />
-                        ))}
-                    </SingleSelectField>
+                    />
                 </React.Fragment>
             )}
         </React.Fragment>
