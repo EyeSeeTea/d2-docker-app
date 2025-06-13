@@ -20,67 +20,40 @@ export interface SelectInputProps {
     padding?: string | number;
 }
 
-const StyledSelect = styled(Select)<{
-    $borderColor?: string;
-    $height?: string | number;
-    $padding?: string | number;
-}>`
-    .MuiOutlinedInput-notchedOutline {
-        border-color: ${({ $borderColor }) => $borderColor || "red"};
+const StyledSelect = styled(Select)`
+    height: 40px;
+    font-size: 14px;
+
+    & .d2da-MuiOutlinedInput-notchedOutline {
+        border-color: #a0adba;
     }
 
-    &:hover .MuiOutlinedInput-notchedOutline {
-        border-color: ${({ $borderColor }) => $borderColor || "red"};
+    &.d2da-MuiOutlinedInput-root:hover .d2da-MuiOutlinedInput-notchedOutline {
+        border-color: #a0adba;
     }
 
-    &.Mui-focused .MuiOutlinedInput-notchedOutline {
-        border-color: ${({ $borderColor }) => $borderColor || "red"};
+    & .d2da-MuiSelect-select:focus {
+        background-color: transparent;
     }
 
-    .MuiSelect-select {
-        background-color: transparent !important;
-
-        &:focus {
-            background-color: transparent !important;
-        }
-    }
-
-    height: ${({ $height }) => ($height ? `${$height}` : "40px")};
-`;
-
-const StyledOutlinedInput = styled(OutlinedInput)<{
-    $borderColor?: string;
-    $height?: string | number;
-    $padding?: string | number;
-}>`
-    & .MuiOutlinedInput-notchedOutline {
-        border-color: ${({ $borderColor }) => $borderColor || "red"};
-    }
-
-    &:hover .MuiOutlinedInput-notchedOutline {
-        border-color: ${({ $borderColor }) => $borderColor || "red"};
-    }
-
-    &.Mui-focused .MuiOutlinedInput-notchedOutline {
-        border-color: ${({ $borderColor }) => $borderColor || "red"};
-    }
-
-    height: ${({ $height }) => ($height ? `${$height}` : "40px")};
-    padding: ${({ $padding }) => ($padding ? `${$padding}` : "10px")};
-
-    // Prevent default padding override inside input root
-    &.MuiOutlinedInput-root {
-        padding: 0;
-    }
-
-    .MuiSelect-select {
-        background-color: transparent !important;
-
-        &:focus {
-            background-color: transparent !important;
-        }
+    &.d2da-MuiOutlinedInput-root.Mui-focused .d2da-MuiOutlinedInput-notchedOutline {
+        border-color: #009488;
     }
 `;
+
+// const StyledOutlinedInput = styled(OutlinedInput)<{
+//     $borderColor?: string;
+//     $height?: string | number;
+//     $padding?: string | number;
+// }>`
+//     & .d2da-MuiOutlinedInput-notchedOutline {
+//         border-color: rgb(160, 173, 186);
+//         border-radius: 4px;
+//     }
+//
+//     height: 40px;
+//     font-size: 14px;
+// `;
 
 export const SelectInput: React.FC<SelectInputProps> = ({
     label,
@@ -101,9 +74,9 @@ export const SelectInput: React.FC<SelectInputProps> = ({
                 value={value}
                 onChange={onChange}
                 label={label}
-                input={
-                    <StyledOutlinedInput label={label} $borderColor={borderColor} $height={height} $padding={padding} />
-                }
+                // input={
+                //     <StyledOutlinedInput label={label} $borderColor={borderColor} $height={height} $padding={padding} />
+                // }
             >
                 {loading ? (
                     <MenuItem disabled>
